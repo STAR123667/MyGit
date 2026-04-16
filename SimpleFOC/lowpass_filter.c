@@ -1,0 +1,50 @@
+//===========================
+//创建日期：2025-2-10
+//作    者：Merk Mao
+//功    能：低通滤波  LPF
+//===========================
+
+#include "MyProject.h"
+
+/******************************************************************************/
+LowPassFilter  LPF_current_q,LPF_current_d,LPF_velocity;
+/******************************************************************************/
+void LPF_init(void)
+{
+	LPF_current_q.Tf=0.02;    
+	LPF_current_q.y_prev=0;
+	LPF_current_q.timestamp_prev=_micros();
+	
+	LPF_current_d.Tf=0.02;
+	LPF_current_d.y_prev=0;
+	LPF_current_d.timestamp_prev=_micros();
+	
+	LPF_velocity.Tf=0.02;
+	LPF_velocity.y_prev=0;
+	LPF_velocity.timestamp_prev=_micros();
+}
+/******************************************************************************/
+float LPFoperator(LowPassFilter* LPF,float x)
+{
+	unsigned long now_us;
+	float dt, alpha, y;
+	
+	now_us = _micros();
+	dt = (now_us - LPF->timestamp_prev)*1e-6f;
+	LPF->timestamp_prev = now_us;
+	if (dt < 0.0f ) dt = 1e-3f;
+	else if(dt > 0.3f)   //时间过长，大概是程序刚启动初始化，直接返回
+	{
+		LPF->y_prev = x;
+		return x;
+	}
+	
+	alpha = LPF->Tf/(LPF->Tf + dt);
+	y = alpha*LPF->y_prev + (1.0f - alpha)*x;
+	LPF->y_prev = y;
+	
+	return y;
+}
+/******************************************************************************/
+
+
