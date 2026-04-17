@@ -76,8 +76,9 @@ void SystemClock_Config(void)
     rcu_periph_clock_enable(RCU_AF);
     rcu_periph_clock_enable(RCU_BKP);
     rcu_periph_clock_enable(RCU_PMU);
-    rcu_periph_clock_enable(RCU_PWR);       
+    rcu_periph_clock_enable(RCU_PWR);      
 }
+
 
 //主函数
 int main(void)
@@ -86,7 +87,7 @@ int main(void)
 	   System_Init();
      systick_config();
 
-
+     uint8_t add_num = 0;
 	
     while(1)
     {
