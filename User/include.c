@@ -1,5 +1,8 @@
 #include "include.h"
 
+/*娣诲姞鍙橀噺*/
+uint8_t include_num;
+
 struct DEVICE_Typedef device;
 timer_oc_parameter_struct timer_ocintpara;
 timer_parameter_struct timer_initpara; 
@@ -19,8 +22,8 @@ void System_Init(void)
 }
 void Clock_config(void)
 {
-   rcu_apb2_clock_config(RCU_APB2_CKAHB_DIV1);//系统时钟1分频
-   rcu_apb1_clock_config(RCU_APB1_CKAHB_DIV1);//系统时钟1分频
+   rcu_apb2_clock_config(RCU_APB2_CKAHB_DIV1);//系统时锟斤拷1锟斤拷频
+   rcu_apb1_clock_config(RCU_APB1_CKAHB_DIV1);//系统时锟斤拷1锟斤拷频
 	
 	 rcu_periph_clock_enable(RCU_GPIOD);
 	 rcu_periph_clock_enable(RCU_GPIOC);
