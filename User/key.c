@@ -1,5 +1,5 @@
 #include "key.h"
-/*按键输入获取*/
+
 uint8_t GetKeyNum(void)
 {//10ms
    static uint8_t SaveKey; 
@@ -7,7 +7,7 @@ uint8_t GetKeyNum(void)
    SaveKey = ( KeyNum | SW1 | SW2 <<1 | SW3<<2 );
    return SaveKey;
 }
-/*按键输入处理*/
+
 void ScanKeyDealwith(uint8_t knum)
 {//10ms
 	  
@@ -75,7 +75,6 @@ void gpio_toggle_bits(uint32_t gpio_periph,uint32_t pin)
     }
 }
 
-/*电机频率调节*/
 void motor_frequencyAdj(uint8_t adjNum)
 {
 	  timer_oc_parameter_struct timer_ocintpara;
