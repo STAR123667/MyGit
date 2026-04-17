@@ -3,7 +3,7 @@
 #include "systick.h"
 #include "include.h"
 
-//主函数
+/*主函数*/
 int main(void)
 {
 	    
