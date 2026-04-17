@@ -12,7 +12,7 @@ int main(void)
 	   System_Init();
      systick_config();
 
-	
+
 	
     while(1)
     {
