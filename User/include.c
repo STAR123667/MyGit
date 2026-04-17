@@ -1,8 +1,5 @@
 #include "include.h"
 
-/*添加变量*/
-uint8_t include_num;
-
 struct DEVICE_Typedef device;
 timer_oc_parameter_struct timer_ocintpara;
 timer_parameter_struct timer_initpara; 
@@ -13,7 +10,7 @@ void System_Init(void)
 	  Led_Init();
 	  Key_Init();
 	  Time2_Init();
-    nvic_config();
+      nvic_config();
 	
 	  Motor_Init();
 	

@@ -3,9 +3,6 @@
 #include "systick.h"
 #include "include.h"
 
-/*添加电机频率调节变量*/
-uint8_t motor_frequencyAdj;  
-
 //主函数
 int main(void)
 {

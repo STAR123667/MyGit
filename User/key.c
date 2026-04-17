@@ -1,8 +1,5 @@
 #include "key.h"
 
-/*添加变量*/
-uint8_t key_num;
-
 uint8_t GetKeyNum(void)
 {//10ms
    static uint8_t SaveKey; 
