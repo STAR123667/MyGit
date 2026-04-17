@@ -61,7 +61,12 @@ void ScanKeyDealwith(uint16_t key_num)
                      }
 }
 
+//系统初始化函数
+void System_Init(void)
+{
+}
 
+//主函数
 int main(void)
 {
 	    
