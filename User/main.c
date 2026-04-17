@@ -5,6 +5,7 @@
 
 /*增加注释*/
 uint8_t key_value = 0;
+uint16_t key_num = 0;
 
 int main(void)
 {
