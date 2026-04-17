@@ -1,0 +1,41 @@
+
+# 初始化 Git 仓库（如果尚未初始化）
+git init
+
+# 添加文件到暂存区
+git add .
+
+# 提交更改
+git commit -m "初始提交：上传现有项目"
+
+#将当前分支重命名为main（可选）
+git branch -M main 
+
+# 将本地仓库与远程仓库关联
+git remote add origin https://github.com/username/repo-name.git
+
+# 推送代码到远程仓库（适用于 master分支）
+git push -u origin main
+
+# or如果想强制推送到远程仓库（覆盖所有内容）
+git push -f origin master
+
+# 删除现有的origin
+git remote remove origin
+
+# 查看目前连接的origin
+git remote -v
+
+# 拉取最新的更改
+git pull origin 分支名  
+
+# 检查是否有未提交的更改
+git status
+
+# 如果有未提交的更改，你需要先提交它们
+git add .
+git commit -m "提交信息"
+
+# 拉取项目到本地当前路径下，终端先cd到存放文件夹下面在拉取
+git clone https://github.com/STAR123667/MyGit.git
+
