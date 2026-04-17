@@ -66,6 +66,19 @@ void System_Init(void)
 {
 }
 
+//系统时钟配置函数  
+void SystemClock_Config(void)
+{
+    rcu_periph_clock_enable(RCU_GPIOA);
+    rcu_periph_clock_enable(RCU_GPIOC);
+    rcu_periph_clock_enable(RCU_GPIOD);
+    rcu_periph_clock_enable(RCU_TIMER1);    
+    rcu_periph_clock_enable(RCU_AF);
+    rcu_periph_clock_enable(RCU_BKP);
+    rcu_periph_clock_enable(RCU_PMU);
+    rcu_periph_clock_enable(RCU_PWR);       
+}
+
 //主函数
 int main(void)
 {
