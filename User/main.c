@@ -2,6 +2,9 @@
 #include "gd32f10x_libopt.h"
 #include "systick.h"
 #include "include.h"
+
+/*增加注释*/
+
 int main(void)
 {
 	    
