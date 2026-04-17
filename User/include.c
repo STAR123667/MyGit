@@ -19,8 +19,8 @@ void System_Init(void)
 }
 void Clock_config(void)
 {
-   rcu_apb2_clock_config(RCU_APB2_CKAHB_DIV1);//ϵͳʱ��1��Ƶ
-   rcu_apb1_clock_config(RCU_APB1_CKAHB_DIV1);//ϵͳʱ��1��Ƶ
+     rcu_apb2_clock_config(RCU_APB2_CKAHB_DIV1);//APB2时钟初始化
+     rcu_apb1_clock_config(RCU_APB1_CKAHB_DIV1);//APB1时钟初始化
 	
 	 rcu_periph_clock_enable(RCU_GPIOD);
 	 rcu_periph_clock_enable(RCU_GPIOC);
