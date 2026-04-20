@@ -1,6 +1,8 @@
 #include "network.h"
 #include "ui_network.h"
 
+/*注释添加*/
+
 network::network(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::network)
