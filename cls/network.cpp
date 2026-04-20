@@ -1,10 +1,6 @@
 #include "network.h"
 #include "ui_network.h"
 
-/*添加注释*/
-__uint8_t  openStart = 0;   /*CAN发送标志位*/
-/**/
-
 network::network(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::network)
