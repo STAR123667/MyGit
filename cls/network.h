@@ -134,7 +134,7 @@ public:
        int Client_CCD_Send_String(char *stringBuffer);
 
 
-       void readData(void)
+       bool readData(void)
        {
             QByteArray byteArray = face_Socket->readAll();   /*读取所有数据*/
 //                   QByteArray byteArray = face_Socket->readLine(0);   /*读取一行数据*/
@@ -144,17 +144,20 @@ public:
            {
                const char* cStr = byteArray.data();         /*数据格式转换*/
 
-               sqlite->ClearFree_CCD_Table();
+               sqlite->ClearFree_CCD_Table();    /*清空CCD表格*/
 
-               sqlite->InsertInto_CCD_Table(cStr);
+               sqlite->InsertInto_CCD_Table(cStr); /*插入数据到表格*/
 
-               aiPython->ccd_updata_TableCSV();
+               aiPython->ccd_updata_TableCSV();  /*生成CCD CSV表格*/
 
-               face_Socket->write(cStr);
+               face_Socket->write(cStr);   /*向服务器发送数据*/
+
+                          return 1;
            }
            else
            {
                    /*没数据可供读取或者发生了错误*/
+                   return 0;
            }
 
        }
