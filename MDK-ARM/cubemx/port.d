@@ -1,0 +1,12 @@
+cubemx\port.o: ../Middlewares/Third_Party/FreeRTOS/Source/portable/RVDS/ARM_CM4F/port.c
+cubemx\port.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/FreeRTOS.h
+cubemx\port.o: D:\keilARM\ARM\version5.06\Bin\..\include\stddef.h
+cubemx\port.o: D:\keilARM\ARM\version5.06\Bin\..\include\stdint.h
+cubemx\port.o: ../Inc/FreeRTOSConfig.h
+cubemx\port.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/projdefs.h
+cubemx\port.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/portable.h
+cubemx\port.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/deprecated_definitions.h
+cubemx\port.o: ../Middlewares/Third_Party/FreeRTOS/Source/portable/RVDS/ARM_CM4F/portmacro.h
+cubemx\port.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/mpu_wrappers.h
+cubemx\port.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/task.h
+cubemx\port.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/list.h
