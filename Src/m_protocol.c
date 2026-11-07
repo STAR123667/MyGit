@@ -136,11 +136,11 @@ void mp_rx_downlink_data_handle( uint8_t *data, uint16_t length )//下行数据�
 					{
 						offset++;		/* 兼容 7 字节帧的 0x5E 结尾 */
 					}
-					continue;
+					continue;// 跳出循环
 				}
 			}
 		}
-		
+
 		if((0xA5 == p[0])&&(0xA5 == p[1]))
 		{
 			len_value = p[3];
