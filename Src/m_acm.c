@@ -60,8 +60,8 @@ static void m_acm_ai_ctrl_handle(acm_msg_content_t *content);//AI控制处理
 
 
 //--------------------------------------------------------------------------------------------------------------
-static QueueHandle_t g_acm_msg_queue;
-static EventGroupHandle_t acm_events=NULL;
+static QueueHandle_t g_acm_msg_queue;      // 消息队列
+static EventGroupHandle_t acm_events=NULL; // 事件组
 static uint8_t b_acm_ready  =false; 
 
 uint8_t tune_pool[sizeof(tune_item_t)*40];
@@ -69,7 +69,7 @@ ring_buf_t tune_queue;
 uint8_t b_monitor=false;
 static float g_apr_pool[MAX_ACL_NUM][sizeof(float)*WINDOW_SIZE+1];
 static ring_buf_t g_apr_queue[MAX_ACL_NUM];
-static TimerHandle_t m_timer_vv_delay;
+static TimerHandle_t m_timer_vv_delay;     // 延时定时器
 
 static acm_run_para_t g_acm_run_para[2]=
 {
@@ -81,17 +81,17 @@ static uint16_t g_sip_sec_cnt[2]={0,0};
 
 static const acm_msg_handle_entry_t g_acm_msg_handle_tbl[]=
 {
-	{ACM_MSG_TYPE_UPDATE_APR, 		m_acm_air_pressure_update_handle },
-	{ACM_MSG_TYPE_SET_TARGET_APR, 	m_acm_set_target_apr_handle },
-	{ACM_MSG_TYPE_DUMP_INFO, 		m_dump_system_info_handle },
+	{ACM_MSG_TYPE_UPDATE_APR, 		m_acm_air_pressure_update_handle },   // 更新气压
+	{ACM_MSG_TYPE_SET_TARGET_APR, 	m_acm_set_target_apr_handle },        // 设置目标气压
+	{ACM_MSG_TYPE_DUMP_INFO, 		m_dump_system_info_handle },          // 打印系统信息
 	//{ACM_MSG_TYPE_UPDATE_CURRENT, 	m_acm_current_update_handle },
-	{ACM_MSG_TYPE_STOP_APR_TUNNING, 	m_acm_stop_apr_tunning_handle },
-	{ACM_MSG_TYPE_SET_TARGET_APR_SEQ, 	m_acm_set_target_apr_seq_handle },
-	{ACM_MSG_TYPE_SET_PARA, 	m_acm_set_run_para_handle },
+	{ACM_MSG_TYPE_STOP_APR_TUNNING, 	m_acm_stop_apr_tunning_handle },  // 停止apr调谐
+	{ACM_MSG_TYPE_SET_TARGET_APR_SEQ, 	m_acm_set_target_apr_seq_handle },// 设置目标apr序列
+	{ACM_MSG_TYPE_SET_PARA, 	m_acm_set_run_para_handle },              // 设置运行参数
 
-	{ ACM_MSG_TYPE_SECOND_TICK, m_acm_second_tick_handle },
-	{ ACM_MSG_TYPE_SWITCH_MODE, m_acm_switch_function_handle },
-	{ ACM_MSG_TYPE_AI_CTRL, m_acm_ai_ctrl_handle },
+	{ ACM_MSG_TYPE_SECOND_TICK, m_acm_second_tick_handle },               // 秒级定时器
+	{ ACM_MSG_TYPE_SWITCH_MODE, m_acm_switch_function_handle },           // 切换功能
+	{ ACM_MSG_TYPE_AI_CTRL, m_acm_ai_ctrl_handle },                       // AI控制处理
 	
 };
 
@@ -325,21 +325,20 @@ acm_t g_acm_table[]=
 
 func_mng_t g_function_mng=
 {
-	.partion = PARTION_MAX,
-	.function = TUNE_MODE_AUTO,
+	.partion = PARTION_MAX,       // 分区数 
+	.function = TUNE_MODE_AUTO,   // 工作模式
 };
 
-static uint8_t g_strength[2] = { M_STRENGH_STRONG, M_STRENGH_STRONG };
+static uint8_t g_strength[2] = { M_STRENGH_STRONG, M_STRENGH_STRONG };// 新增：系统强度
 
-static uint8_t g_sip_cfg[2]={true, true};
+static uint8_t g_sip_cfg[2]={true, true};// sip配置
 
-static const float spa_mode_pct[3]=
+static const float spa_mode_pct[3]=  // spa模式下apr百分比
 {
 	0.25f,1.0f,0.25f,
 };
 
-
-static const float sleep_enhance_mode_pct[3]=
+static const float sleep_enhance_mode_pct[3]= // 睡眠增强模式下apr百分比
 {
 	0.25f,1.0f,0.25f,
 };
@@ -354,14 +353,14 @@ static uint8_t g_force_report_apr = 0;   // 新增：姿态切换时置1，持�
 //********************************************************************************
 void m_acm_init( void )        
 {
-	ring_buffer_init( &tune_queue, tune_pool, sizeof(tune_pool));
+	ring_buffer_init( &tune_queue, tune_pool, sizeof(tune_pool));//初始化调谐队列
 
 	for( uint8_t i=0;i<MAX_ACL_NUM;i++)
 	{
-		ring_buffer_init(&g_apr_queue[i], (uint8_t *)g_apr_pool[i], (sizeof(float))*WINDOW_SIZE+1 );
+		ring_buffer_init(&g_apr_queue[i], (uint8_t *)g_apr_pool[i], (sizeof(float))*WINDOW_SIZE+1 );//初始化apr队列
 	}
 	
-	g_acm_msg_queue = xQueueCreate( ACM_MSG_QUEUE_SIZE, sizeof(acm_msg_t));
+	g_acm_msg_queue = xQueueCreate( ACM_MSG_QUEUE_SIZE, sizeof(acm_msg_t));//创建消息队列
 	if( NULL == g_acm_msg_queue )
 	{
 		LOG("acm queue init fail");
@@ -369,18 +368,18 @@ void m_acm_init( void )
 
 	if (acm_events == NULL) 
 	{
-		acm_events = xEventGroupCreate();
+		acm_events = xEventGroupCreate();// 创建事件组
 	}
 
-	xEventGroupClearBits(acm_events, 0x00ffffff);
-
+	xEventGroupClearBits(acm_events, 0x00ffffff);// 清空事件组
+    //电磁阀放气软定时 200毫秒//
 	m_timer_vv_delay = xTimerCreate("vvdelay",
 								pdMS_TO_TICKS(VV_DELAY_MS),  
 								pdFALSE, 
 								NULL,
 								m_vv_delay_timer_callback);
 	xTimerStop( m_timer_vv_delay, pdMS_TO_TICKS(1));
-
+    //消息发送软定时 1秒//
 	g_function_mng.timer= xTimerCreate("wk_mode",
 								pdMS_TO_TICKS(1000),  
 								pdTRUE, 
@@ -403,10 +402,10 @@ void m_acm_thread(void const * argument)
 
 	if (acm_events) 
 	{
-		xEventGroupSetBits(acm_events, ACM_EVENT_INIT_DONE );
+		xEventGroupSetBits(acm_events, ACM_EVENT_INIT_DONE );// 设置事件组
 	}
 
-	b_acm_ready = true;
+	b_acm_ready = true;// 设置ACM初始化完成标志
 
 #if 1
 	{
@@ -414,7 +413,7 @@ void m_acm_thread(void const * argument)
 
 		#if 1
 
-		ring_buffer_clean( &tune_queue );
+		ring_buffer_clean( &tune_queue );// 清空调谐队列
 
 		for(uint8_t i=0;i<ACL_ID_MAX;i++)	
 		{
@@ -430,17 +429,17 @@ void m_acm_thread(void const * argument)
 	}
 #endif
 
-	xTimerStart( g_function_mng.timer, pdMS_TO_TICKS(1));
+	xTimerStart( g_function_mng.timer, pdMS_TO_TICKS(1));// 启动工作模式管理定时器
 
 	for(;;) 
 	{
-		if(pdPASS == xQueueReceive( g_acm_msg_queue,  &msg, portMAX_DELAY))
+		if(pdPASS == xQueueReceive( g_acm_msg_queue,  &msg, portMAX_DELAY))// 接收消息
 		{
 			for( i=0; i< cnt; i++ )
 			{
-				if( msg.type == g_acm_msg_handle_tbl[i].type )
+				if( msg.type == g_acm_msg_handle_tbl[i].type )// 消息匹配
 				{
-					g_acm_msg_handle_tbl[i].handle( &(msg.content) );
+					g_acm_msg_handle_tbl[i].handle( &(msg.content) );// 调用消息处理函数
 
 					break;
 				}
@@ -450,9 +449,9 @@ void m_acm_thread(void const * argument)
 }
 
 
-BaseType_t m_acm_post_msg( acm_msg_type_t type, acm_msg_content_t *content, uint8_t b_from_isr )
+BaseType_t m_acm_post_msg( acm_msg_type_t type, acm_msg_content_t *content, uint8_t b_from_isr ) // 发送消息 
 {
-	acm_msg_t msg;
+	acm_msg_t msg;      
 	BaseType_t xReturn;
 
 	msg.type = type;
@@ -462,20 +461,20 @@ BaseType_t m_acm_post_msg( acm_msg_type_t type, acm_msg_content_t *content, uint
 		memcpy( (uint8_t *)&(msg.content), ( uint8_t *)content, sizeof(acm_msg_content_t));
 	}
 
-	if(true == b_from_isr)
+	if(true == b_from_isr)// 从中断中发送消息
 	{
-		BaseType_t xHigherPriorityTaskWoken = pdFALSE;
+		BaseType_t xHigherPriorityTaskWoken = pdFALSE;// 中断优先级
 
-		xQueueSendToBackFromISR( g_acm_msg_queue, &msg, &xHigherPriorityTaskWoken );
+		xQueueSendToBackFromISR( g_acm_msg_queue, &msg, &xHigherPriorityTaskWoken );// 发送消息
 
 		if( xHigherPriorityTaskWoken == pdTRUE )
 		{
-			portYIELD_FROM_ISR( xHigherPriorityTaskWoken );
+			portYIELD_FROM_ISR( xHigherPriorityTaskWoken );// 中断优先级
 		}
 	}
 	else
 	{
-		xReturn = xQueueSend( g_acm_msg_queue,  &msg, pdMS_TO_TICKS(20));
+		xReturn = xQueueSend( g_acm_msg_queue,  &msg, pdMS_TO_TICKS(20));// 发送消息
 
 		if(xReturn!=pdTRUE)
 		{
@@ -650,12 +649,12 @@ void m_acm_set_target_apr_seq_handle(acm_msg_content_t *content)
 	}	
 }
 
-void m_dump_system_info( void )
+void m_dump_system_info( void )// 打印系统信息
 {
 	m_acm_post_msg( ACM_MSG_TYPE_DUMP_INFO, NULL, false );
 }
 
-void m_acm_stop_apr_tunning( void )
+void m_acm_stop_apr_tunning( void )// 停止调谐
 {
 	m_acm_post_msg( ACM_MSG_TYPE_STOP_APR_TUNNING, NULL, false );
 }	
@@ -1214,17 +1213,17 @@ acm_t *m_get_acm_instance( acl_id_t id )
 }
 
 
-void m_vv_delay_timer_callback(TimerHandle_t xTimer) 
+void m_vv_delay_timer_callback(TimerHandle_t xTimer)// 定时器回调函数，用于放气阀延迟定时器
 {
-	drv_solenoid_valve_control(VV_ID_01, M_SV_OFF);
-	drv_solenoid_valve_control(VV_ID_02, M_SV_OFF);
-	drv_solenoid_valve_control(VV_ID_03, M_SV_OFF);
+	drv_solenoid_valve_control(VV_ID_01, M_SV_OFF); //关闭放气阀1 
+	drv_solenoid_valve_control(VV_ID_02, M_SV_OFF); //关闭放气阀2 
+	drv_solenoid_valve_control(VV_ID_03, M_SV_OFF); //关闭放气阀3 
 	xTimerStop( m_timer_vv_delay, pdMS_TO_TICKS(1));
 	LOG("timeout stop vv");
 }
 
 
-void m_work_mode_mng_timer_callback(TimerHandle_t xTimer) 
+void m_work_mode_mng_timer_callback(TimerHandle_t xTimer) // 定时器回调函数，用于工作模式管理
 {
 	 m_acm_post_msg( ACM_MSG_TYPE_SECOND_TICK, NULL, false );
 }

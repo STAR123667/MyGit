@@ -46,6 +46,7 @@ void mp_set_sip_handle( uint8_t *data, uint16_t length );/* 设置SIP吸气开�
 
 void mp_get_sip_handle( uint8_t *data, uint16_t length );/* 查询SIP开关状态 */
 
+void send_version_rsp(void);/* 云端查询控制盒的版本号 */
 
 const m_cmd_entry_t g_m_cmd_entrys[]= 
 {
@@ -65,8 +66,8 @@ const m_cmd_entry_t g_m_cmd_entrys[]=
 	{ M_CMD_GET_SIP, mp_get_sip_handle },                //查询SIP开关状态
 };
 
-m_role_t g_role = M_ROLE_MASTER;
-static uint8_t wifi_mac[6]={0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF};
+m_role_t g_role = M_ROLE_MASTER;// 当前控制盒的角色
+static uint8_t wifi_mac[6]={0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF};// WiFi MAC地址
 
 
 
@@ -96,25 +97,55 @@ f9 11 d9 13 81 45 88 c6 01 20
 3c 5c 58 5e
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 */
-void mp_rx_downlink_data_handle( uint8_t *data, uint16_t length )
+void mp_rx_downlink_data_handle( uint8_t *data, uint16_t length )//下行数据处理
 {
 	uint8_t *p;
 	uint16_t offset;
 	uint16_t len_value;
 	
+
 	LOG("rx downlink data:");
 
 	offset = 0;
 
 	while( offset < length )
 	{
-		p = data + offset;
+		p = data + offset;  // 指向当前帧的起始位置
+		
+		/* 云端查询主板版本号: A5 A5 0xE0 0x01 OBJ FCS (兼容带 0x5E 结尾) */
+		if( ((length - offset) >= 6) && (0xA5 == p[0]) && (0xA5 == p[1]) )
+		{
+			uint8_t cmd_v = p[2];
+			uint8_t len_v = p[3];
+
+			if( (M_CMD_VERSION_QUERY == cmd_v) && (0x01 == len_v) )
+			{
+				uint8_t obj  = p[4];
+				uint8_t fcs  = p[5];
+				uint8_t calc = (uint8_t)(cmd_v + len_v + obj);
+
+				if( fcs == calc )	/* 校验通过 */
+				{
+					if( OBJ_MAIN_BOARD == obj )	/* 查询对象是主板 */
+					{
+						send_version_rsp();	/* 上行返回版本号 */
+					}
+
+					offset += 6;		/* 消费整帧 */
+					if( (offset < length) && (MJ_EOF == data[offset]) )
+					{
+						offset++;		/* 兼容 7 字节帧的 0x5E 结尾 */
+					}
+					continue;
+				}
+			}
+		}
 		
 		if((0xA5 == p[0])&&(0xA5 == p[1]))
 		{
 			len_value = p[3];
 
-			if( length - offset >= len_value + 6 )
+			if( length - offset >= len_value + 6 )// 剩余帧长度大于等于帧长度+6
 			{
 				if( mp_is_frame_valaid( p, len_value + 6 ) == true )
 				{
@@ -130,7 +161,7 @@ void mp_rx_downlink_data_handle( uint8_t *data, uint16_t length )
 
 		if((0xA5 == p[0])&&(0xA5 == p[1]))
 		{
-			if( length - offset >= 12 )
+			if( length - offset >= 12 )// 剩余帧长度大于等于帧长度+12
 			{
 				uint8_t crc_len=0;
 				uint8_t fctrl=0;
@@ -156,6 +187,8 @@ void mp_rx_downlink_data_handle( uint8_t *data, uint16_t length )
 			}
 		}
 			
+
+
 		offset++;
 
 
@@ -222,8 +255,7 @@ void mp_process_frame( uint8_t *data, uint16_t length )
 	uint8_t i;
 	uint8_t cmd = data[2];
 	
-	if( ( cmd >= OTA_CMD_MIN ) &&
-            ( cmd <= OTA_CMD_MAX ))
+	if( ( cmd >= OTA_CMD_MIN ) && ( cmd <= OTA_CMD_MAX ))
 	{
 		m_ota_process_frame( data, length );
 	}
@@ -566,7 +598,7 @@ void mp_get_wifi_mac_handle( uint8_t *data, uint16_t length )
 void mp_get_device_info_handle( uint8_t *data, uint16_t length )
 {
 	//if(mp_get_role()==M_ROLE_MASTER)
-	{
+//	{
 		uint8_t payload[18];
 		uint8_t *p_offset;
 
@@ -594,7 +626,7 @@ void mp_get_device_info_handle( uint8_t *data, uint16_t length )
 		}
 
 		mp_build_and_send_frame( M_CMD_DEV_INFO_RRSP, payload, sizeof(payload) );
-	}
+//	}
 }
 
 
@@ -763,4 +795,35 @@ void mp_get_sip_handle( uint8_t *data, uint16_t length )
 	}
 	
 	mp_build_and_send_frame( M_CMD_GET_SIP_RSP, payload, 2 );
+}
+
+
+//设备上报云端主板版本号
+void send_version_rsp(void)
+{
+       uint8_t frame[15]; 
+	     uint8_t *p = frame;
+
+       *p++ = 0xB5;                    // SOF high
+       *p++ = 0xB5;                    // SOF low
+       *p++ = M_CMD_VERSION_RSP;       // CMD = 0xE1
+       *p++ = 0x09;                    // LEN = 9
+     
+       *p++ = 0x02;                 
+
+       *p++ = MB_FW_VERSION_MAJOR;     // 固件主版本      
+       *p++ = MB_FW_VERSION_MINOR;     // 固件次版本
+       *p++ = MB_FW_VERSION_PATCH;     // 固件修订号
+
+       *p++ = MB_HW_VERSION_J;         // 硬件主版本
+       *p++ = MB_HW_VERSION_N;         // 硬件次版本
+       *p++ = MB_HW_VERSION_T;         // 硬件修订号
+       *p++ = 0x00;                    // SAVE_1
+       *p++ = 0x00;                    // SAVE_2
+    
+	     *p++ = mp_calc_cs(frame + 2, 2 + 9);  // FCS = CMD~SAVE_2累加和
+       *p++ = MJ_EOF;                     // 0x5E
+
+        HAL_UART_Transmit(&huart3, frame, sizeof(frame), 10);
+
 }

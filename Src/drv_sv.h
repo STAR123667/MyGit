@@ -8,10 +8,10 @@
 
 
 #define PUMP_SV_POWER_EN_PORT		GPIOA
-#define PUMP_SV_POWER_EN_PIN		GPIO_PIN_12
+#define PUMP_SV_POWER_EN_PIN		GPIO_PIN_12  //气泵+电磁阀电源使能
 
 #define SV_POWER_EN_PORT				GPIOG
-#define SV_POWER_EN_PIN				GPIO_PIN_2
+#define SV_POWER_EN_PIN				GPIO_PIN_2   //水阀电源控制
 
 #define SV_ON_STATE_DUTY				95
 #define SV_ON_STATE_KEEP_DUTY		30

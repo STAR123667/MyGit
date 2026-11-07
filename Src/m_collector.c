@@ -26,7 +26,7 @@ static __IO uint32_t adc1_raw_result_a[ADC_CH_NUM*ADC_TIMES_PER_ROUND] = {0};
 
 //===============================================================================
 
-void m_collector_init(void)
+void m_collector_init(void)// 初始化ADC采集线程
 {
 	uint16_t pin_mask=0;
 	GPIO_InitTypeDef GPIO_InitStruct = {0};
@@ -58,20 +58,19 @@ void m_collector_init(void)
 	HAL_GPIO_Init(GPIOD, &GPIO_InitStruct);
 	HAL_GPIO_WritePin(GPIOD, pin_mask, GPIO_PIN_SET); 
 	
-	osThreadDef(cltr, m_collector_thread, osPriorityNormal, 0, 1024);
+	osThreadDef(cltr, m_collector_thread, osPriorityNormal, 0, 1024);//创建ADC采集线程
 	osThreadCreate(osThread(cltr), NULL);
 }
 
 
-void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* AdcHandle)
+void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* AdcHandle)// ADC转换完成回调函数
 {
 	BaseType_t xHigherPriorityTaskWoken, xResult;
 	
-	if (( collector_events ) &&
-		( &hadc1 == AdcHandle ))
+	if (( collector_events )&&( &hadc1 == AdcHandle )) // ADC转换完成
 	{		
-		memcpy((uint8_t *)m_adc_cache.cache, (uint8_t *)adc1_raw_result_a, sizeof(uint32_t)*m_adc_cache.size );
-		if( true == m_adc_cache.b_new )
+		memcpy((uint8_t *)m_adc_cache.cache, (uint8_t *)adc1_raw_result_a, sizeof(uint32_t)*m_adc_cache.size );// 复制ADC转换结果到缓存区
+		if( true == m_adc_cache.b_new )    
 		{
 			m_adc_cache.mis_cnt++;
 			
@@ -79,20 +78,20 @@ void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* AdcHandle)
 		}
 		m_adc_cache.b_new = true;
 
-	    xHigherPriorityTaskWoken = pdFALSE;
+	    xHigherPriorityTaskWoken = pdFALSE; // 获取更高优先级任务的唤醒状态
 
-	    xResult = xEventGroupSetBitsFromISR(collector_events, CLTR_EVENT_ADC_DONE, &xHigherPriorityTaskWoken );
+	    xResult = xEventGroupSetBitsFromISR(collector_events, CLTR_EVENT_ADC_DONE, &xHigherPriorityTaskWoken );// 设置事件标志
 
-	    if( xResult == pdPASS )
+	    if( xResult == pdPASS )// 中断唤醒更高优先级任务
 	    {
-	        portYIELD_FROM_ISR( xHigherPriorityTaskWoken );
+	        portYIELD_FROM_ISR( xHigherPriorityTaskWoken );// 从中断中唤醒更高优先级任务
 	    }
 	}
 }
 
 
 
-void m_collector_thread(void const *argument)
+void m_collector_thread(void const *argument)// ADC采集线程
 {
 	HAL_TIM_Base_Start(&htim3);
 	__HAL_TIM_ENABLE_IT(&htim3, TIM_IT_UPDATE);
@@ -106,13 +105,13 @@ void m_collector_thread(void const *argument)
 
 	for(;;) 
 	{
-		xEventGroupWaitBits( collector_events, CLTR_EVENT_ADC_DONE , 1, 0, portMAX_DELAY );
+		xEventGroupWaitBits( collector_events, CLTR_EVENT_ADC_DONE , 1, 0, portMAX_DELAY );// 等待ADC转换完成事件
 		{
 			float volt[ADC_CH_NUM];
 			acm_msg_update_apr_t update_apr;
 //			acm_msg_update_current_t update_curnt;
 			
-			if( true == m_is_acm_ready())
+			if( true == m_is_acm_ready())// 检查ACM是否准备好
 			{
 				uint8_t i;
 				uint32_t temp;

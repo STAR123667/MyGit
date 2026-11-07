@@ -7,7 +7,7 @@
 
 
 #define ADC_CH_NUM				16
-#define ADC_TIMES_PER_ROUND	5
+#define ADC_TIMES_PER_ROUND	    5
 
 #define CLTR_EVENT_ADC_DONE			0x00000001
 

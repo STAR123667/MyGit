@@ -157,9 +157,9 @@
         <Bp>
           <Number>0</Number>
           <Type>0</Type>
-          <LineNumber>609</LineNumber>
+          <LineNumber>807</LineNumber>
           <EnabledFlag>1</EnabledFlag>
-          <Address>134320416</Address>
+          <Address>134325802</Address>
           <ByteObject>0</ByteObject>
           <HtxType>0</HtxType>
           <ManyObjects>0</ManyObjects>
@@ -168,23 +168,7 @@
           <BreakIfRCount>1</BreakIfRCount>
           <Filename>F:\妗岄潰\婊′匠鍥轰欢婧愮爜\m_mtrs_eon_s16-2026-11-03(鏈€鏂版帶鍒剁洅婧愮爜)\cubemx\Src\m_protocol.c</Filename>
           <ExecCommand></ExecCommand>
-          <Expression>\\mtrs_ultra_16ch\../Src/m_protocol.c\609</Expression>
-        </Bp>
-        <Bp>
-          <Number>1</Number>
-          <Type>0</Type>
-          <LineNumber>107</LineNumber>
-          <EnabledFlag>1</EnabledFlag>
-          <Address>134321558</Address>
-          <ByteObject>0</ByteObject>
-          <HtxType>0</HtxType>
-          <ManyObjects>0</ManyObjects>
-          <SizeOfObject>0</SizeOfObject>
-          <BreakByAccess>0</BreakByAccess>
-          <BreakIfRCount>1</BreakIfRCount>
-          <Filename>F:\妗岄潰\婊′匠鍥轰欢婧愮爜\m_mtrs_eon_s16-2026-11-03(鏈€鏂版帶鍒剁洅婧愮爜)\cubemx\Src\m_protocol.c</Filename>
-          <ExecCommand></ExecCommand>
-          <Expression>\\mtrs_ultra_16ch\../Src/m_protocol.c\107</Expression>
+          <Expression>\\mtrs_ultra_16ch\../Src/m_protocol.c\807</Expression>
         </Bp>
       </Breakpoint>
       <WatchWindow1>

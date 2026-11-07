@@ -63,6 +63,31 @@
 #define M_CMD_NOTIFY_SNORING		0xC0
 #define M_CMD_STOP_SNORING		0xC1
 
+
+/*******  自行添加宏定义 *******/
+#define MJ_SOF_DL 0xA5A5   // 下行帧头
+#define MJ_SOF_UL 0xB5B5   // 上行帧头   
+   
+// 命令码
+#define M_CMD_VERSION_QUERY     0xE0
+#define M_CMD_VERSION_RSP       0xE1
+
+// 目标对象
+#define OBJ_COMM_MODULE   0x01
+#define OBJ_MAIN_BOARD    0x02   // 主控板
+#define OBJ_AI_MODULE     0x03
+#define OBJ_SENSOR        0x04
+
+// ===== 主板固件版本（按需修改） =====
+#define MB_FW_VERSION_MAJOR   2
+#define MB_FW_VERSION_MINOR   1
+#define MB_FW_VERSION_PATCH   3
+
+// ===== 主板硬件版本 =====
+#define MB_HW_VERSION_J    1
+#define MB_HW_VERSION_N    0
+#define MB_HW_VERSION_T    0
+
 typedef enum
 {
 	M_ROLE_MASTER = 0,

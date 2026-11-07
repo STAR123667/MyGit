@@ -153,13 +153,13 @@ int main(void)
 
 	drv_air_pump_init();
 
-	drv_solenoid_valve_init();
+	drv_solenoid_valve_init(); //气阀初始化
 	
-	m_acm_init();
+	m_acm_init();           //ACM模块初始化
 
-	m_collector_init();
+	m_collector_init();     //ADC采集线程
 
-	m_uart_traffic_init();
+	m_uart_traffic_init();  //UART线程
   /* USER CODE END 2 */
 
   /* USER CODE BEGIN RTOS_MUTEX */
