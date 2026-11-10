@@ -63,7 +63,7 @@ void m_collector_init(void)// 初始化ADC采集线程
 }
 
 
-void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* AdcHandle)// ADC转换完成回调函数
+void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* AdcHandle)// ADC转换完成回调函数，20ms进来一次
 {
 	BaseType_t xHigherPriorityTaskWoken, xResult;
 	
@@ -91,9 +91,9 @@ void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* AdcHandle)// ADC转换完成回
 
 
 
-void m_collector_thread(void const *argument)// ADC采集线程
+void m_collector_thread(void const *argument)// ADC采集线程20ms，每个通道有5次采集值
 {
-	HAL_TIM_Base_Start(&htim3);
+	HAL_TIM_Base_Start(&htim3);//20ms
 	__HAL_TIM_ENABLE_IT(&htim3, TIM_IT_UPDATE);
 	if(HAL_ADC_Start_DMA(&hadc1, (uint32_t*)adc1_raw_result_a, ADC_CH_NUM*ADC_TIMES_PER_ROUND) != HAL_OK)
 	{

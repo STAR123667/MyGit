@@ -143,7 +143,7 @@ void drv_ai_process_frame( uint8_t *frame, uint16_t length )
 
 				if(apr_seq.mask !=0)
 				{
-					m_acm_set_target_apr_seq( &apr_seq );
+					m_acm_set_target_apr_seq( &apr_seq );//气囊并行调节
 				}
 				else
 				{

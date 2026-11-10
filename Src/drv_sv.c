@@ -46,7 +46,7 @@ sv_item_t g_sv_item[]=
 	{ GPIOG, GPIO_PIN_0 }, //电磁阀_右肩
 	{ GPIOG, GPIO_PIN_1 }, //电磁阀_右腰
 	{ GPIOE, GPIO_PIN_11 },//电磁阀_右臂1
-	{ GPIOE, GPIO_PIN_12 },//电磁阀_右臂-2
+	{ GPIOE, GPIO_PIN_12 },//电磁阀_右臂-2    
 	{ GPIOE, GPIO_PIN_13 },//电磁阀_右臂-3
 	{ GPIOD, GPIO_PIN_9 }, //电磁阀_右臂-4
 	{ GPIOD, GPIO_PIN_10 },//电磁阀_右小腿 
@@ -111,7 +111,7 @@ void drv_solenoid_valve_init(void)
 	HAL_GPIO_Init(GPIOG, &GPIO_InitStruct);
 
 
-	for(uint8_t i=0;i<ARRAY_SIZE(g_sv_item);i++)
+	for(uint8_t i=0;i<ARRAY_SIZE(g_sv_item);i++)//初始化所有电磁阀
 	{
 		drv_solenoid_valve_control( i, M_SV_OFF );
 	}
@@ -165,7 +165,7 @@ uint32_t m_get_sv_state_mask(void)
 	return g_sv_state_mask;
 }
 
-
+/* 1ms执行 */
 void m_timer6_ms_irq_callback(void)
 {
 	sv_item_t *p_item;

@@ -252,17 +252,17 @@ typedef struct
 
 typedef struct
 {
-	uint16_t acl_id;
-	uint8_t b_tuning;
-	uint8_t b_leaking;
-	uint8_t b_stable;
-	uint8_t tune_dir;
-	float current_apr;
-	float target_apr;
-	float avg_apr;
-	float avg_apr_stable;
-	uint8_t exceed_cnt;
-	uint8_t sv_delay_cnt;
+	uint16_t acl_id;   //气囊的编号
+	uint8_t b_tuning;  //当前是否在调节状态
+	uint8_t b_leaking; //当前是否在漏气状态
+	uint8_t b_stable;  //当前气囊是否平稳
+	uint8_t tune_dir;  //当前是否在充放气
+	float current_apr; //当前的气压值
+	float target_apr;  //目标气压
+	float avg_apr;     //平均气压
+	float avg_apr_stable;//稳定状态后的平均气压
+	uint8_t exceed_cnt;  //稳定状态计数
+	uint8_t sv_delay_cnt;//电磁阀充气延时计数
 }acm_t;
 
 typedef enum
@@ -315,7 +315,7 @@ typedef struct
 	uint32_t total_sec;
 	uint8_t step;
 	acl_action_t action;
-}func_soft_para_t;
+}func_soft_para_t;//清流模式
 
 typedef struct 
 {
@@ -323,7 +323,7 @@ typedef struct
 	uint32_t total_sec;
 	uint8_t step;
 	acl_action_t action;
-}func_sleep_enhance_para_t;
+}func_sleep_enhance_para_t;//助眠模式
 
 typedef struct 
 {
@@ -340,7 +340,7 @@ typedef struct
 	uint32_t total_sec;
 	uint8_t step;
 	acl_action_t action;
-}func_push_spine_para_t;
+}func_push_spine_para_t;//推背模式
 
 typedef struct 
 {
@@ -348,7 +348,7 @@ typedef struct
 	uint32_t total_sec;
 	uint8_t step;
 	acl_action_t action;
-}func_spa_para_t;
+}func_spa_para_t;//SPA模式
 
 
 typedef struct 
@@ -358,7 +358,7 @@ typedef struct
 	uint8_t step;
 	uint8_t delay_sec;
 	acl_action_t action;
-}func_wakeup_para_t;
+}func_wakeup_para_t;//唤醒模式
 
 typedef struct 
 {
@@ -367,7 +367,7 @@ typedef struct
 	uint8_t step;
 	uint8_t shake_cnt;
 	acl_action_t action;
-}func_anti_snore_1_para_t;
+}func_anti_snore_1_para_t;//止鼾模式1
 
 typedef struct 
 {
@@ -376,7 +376,7 @@ typedef struct
 	uint8_t step;
 	uint8_t apr_level[4];
 	acl_action_t action;
-}func_anti_snore_2_para_t;
+}func_anti_snore_2_para_t;//止鼾模式2
 
 typedef struct 
 {
@@ -402,8 +402,8 @@ typedef struct
 {
 	union
 	{
-		func_relax_para_t 			relax_para;
-		func_spa_para_t			spa_para;
+		func_relax_para_t 			    relax_para;  //放松模式
+		func_spa_para_t			        spa_para;       
 		func_sleep_enhance_para_t 	sleep_enhance_para;
 		func_push_spine_para_t		push_spine_para;
 		func_wakeup_para_t		wakeup_para;
@@ -412,11 +412,11 @@ typedef struct
 		func_anti_snore_3_para_t  	anti_snore_3_para;
 		func_anti_snore_4_para_t  	anti_snore_4_para;
 	}para;
-	uint8_t partion;
-	tune_mode_t function;
-	uint32_t total_sec_cnt;
+	uint8_t partion;       //左床还是右床
+	tune_mode_t function;  //当前对应执行的模式
+	uint32_t total_sec_cnt;//模式总的执行时间
 	TimerHandle_t timer;
-}func_mng_t;
+}func_mng_t;//模式管理结构体
 
 
 

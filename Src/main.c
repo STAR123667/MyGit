@@ -144,22 +144,22 @@ int main(void)
   MX_TIM6_Init();
   /* USER CODE BEGIN 2 */
 
-	HAL_TIM_PWM_Stop(&htim4, TIM_CHANNEL_2);
-	HAL_TIM_PWM_Stop(&htim4, TIM_CHANNEL_3);
+	HAL_TIM_PWM_Stop(&htim4, TIM_CHANNEL_2); //左气泵
+	HAL_TIM_PWM_Stop(&htim4, TIM_CHANNEL_3); //右气泵
   
-	drv_led_init();
+	drv_led_init(); //LED初始化
 
-	drv_heater_init();
+	drv_heater_init();//加热器初始化
 
-	drv_air_pump_init();
+	drv_air_pump_init(); //气泵初始化
 
 	drv_solenoid_valve_init(); //气阀初始化
 	
-	m_acm_init();           //ACM模块初始化
+	m_acm_init();  //ACM(气囊管理)模块初始化
 
-	m_collector_init();     //ADC采集线程
+	m_collector_init(); //ADC采集线程
 
-	m_uart_traffic_init();  //UART线程
+	m_uart_traffic_init(); //UART线程
   /* USER CODE END 2 */
 
   /* USER CODE BEGIN RTOS_MUTEX */
@@ -864,6 +864,7 @@ void app_init_thread(void const * argument)
 		{
 			tick_cnt = 0;
 			drv_tmp_sensor_query_current_value();
+			m_heater_timer_tick_1s();
 		}
 		osDelay(250);
 	}

@@ -2,12 +2,13 @@
 #include "m_micro.h"
 #include "m_log.h"
 #include "drv_heater.h"
-#include "m_acm.h"+
+#include "m_acm.h"
 
 
 extern UART_HandleTypeDef huart5;
 
 static uint16_t g_target_tmp[2]={0,0};
+static uint32_t g_heater_remain_sec[2]={0,0};	/* 定时加热剩余秒数, 0 表示未定时 */
 
 static unsigned int CRC_16(unsigned char *str,unsigned int usDataLen);
 static uint8_t b_is_frame_valaid(uint8_t *frame, uint16_t length);
@@ -184,6 +185,44 @@ void m_set_target_temperature(uint8_t partion, uint8_t tmp )
 	}
 
 	g_target_tmp[partion-1] = tmp*10;
+
+	if( 0 == tmp )	/* 目标温度清零时同时取消定时加热 */
+	{
+		g_heater_remain_sec[partion-1] = 0;
+	}
+}
+
+
+void m_set_target_temperature_with_timer(uint8_t partion, uint8_t tmp, uint32_t seconds)
+{
+	if( ( PARTION_LEFT != partion )&&( PARTION_RIGHT != partion ))
+	{
+		return;
+	}
+
+	m_set_target_temperature( partion, tmp );
+
+	g_heater_remain_sec[partion-1] = ( tmp > 0 ) ? seconds : 0;
+}
+
+
+void m_heater_timer_tick_1s(void)
+{
+	for(uint8_t n=0;n<2;n++)
+	{
+		if( g_heater_remain_sec[n] > 0 )
+		{
+			g_heater_remain_sec[n]--;
+
+			if( 0 == g_heater_remain_sec[n] )	/* 到达设定时间, 关闭加热器 */
+			{
+				g_target_tmp[n] = 0;
+				drv_heater_ctrl( n+1, 0 );
+
+				LOG("heater %d timer expired, turn off", n+1);
+			}
+		}
+	}
 }
 
 

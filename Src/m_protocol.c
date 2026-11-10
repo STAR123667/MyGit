@@ -18,7 +18,7 @@ static uint8_t mp_is_frame_valaid( uint8_t *data, uint16_t length );/* 校验帧
 
 static void mp_process_frame( uint8_t *data, uint16_t length );/* 命令分发入口 (OTA/业务表) */
 
-static void mp_get_tune_mode_handle( uint8_t *data, uint16_t length );// 查询自动调温模式  	
+static void mp_get_tune_mode_handle( uint8_t *data, uint16_t length );// 查询当前工作模式  	
 
 static void mp_manual_cfg_target_apr_handle( uint8_t *data, uint16_t length );//处理手动配置目标温度
         
@@ -46,24 +46,27 @@ void mp_set_sip_handle( uint8_t *data, uint16_t length );/* 设置SIP吸气开�
 
 void mp_get_sip_handle( uint8_t *data, uint16_t length );/* 查询SIP开关状态 */
 
+void mp_set_heater_timer_handle( uint8_t *data, uint16_t length );/* 定时加热: 设定时间到后自动关闭 */
+
 void send_version_rsp(void);/* 云端查询控制盒的版本号 */
 
 const m_cmd_entry_t g_m_cmd_entrys[]= 
-{
-	{ M_CMD_GET_TUNE_MODE, mp_get_tune_mode_handle },    //查询自动调温模式  	
-	{ M_CMD_SET_TUNE_MODE, mp_set_tune_mode_handle },    //设置自动调温模式
-	{ M_CMD_GET_APR_PCT, mp_get_apr_percent_handle },    //获取目标温度百分比
-	{ M_CMD_MENUAL_CFG_APR, mp_manual_cfg_target_apr_handle },//手动配置目标温度
-	{ M_CMD_GET_STRENGTH, mp_get_strength_handle },      //获取加热器功率
-	{ M_CMD_SET_STRENGTH, mp_set_strength_handle },      //设置加热器功率
-	{ M_CMD_DEV_INFO, mp_get_device_info_handle },       //上报设备信息
-	{ M_CMD_GET_WIFI_MAC_RSP, mp_get_wifi_mac_handle },  //获取WiFi MAC地址
-	{ M_CMD_HEATER_CTRL, mp_heater_ctrl_handle },        //加热器等级控制
-	{ M_CMD_GET_HEATER_CTRL, mp_get_heater_ctrl_handle },//查询加热器状态
-	{ M_CMD_NOTIFY_SNORING, mp_notify_snoring_handle },  //AI通知打鼾→切换止鼾震动
-	{ M_CMD_STOP_SNORING, mp_stop_snoring_handle },      //停止止鼾→恢复自动
-	{ M_CMD_SET_SIP, mp_set_sip_handle }, 				 //设置SIP吸气开关
-	{ M_CMD_GET_SIP, mp_get_sip_handle },                //查询SIP开关状态
+{  
+	{ M_CMD_GET_TUNE_MODE, mp_get_tune_mode_handle },         //查询当前工作模式
+	{ M_CMD_SET_HEATER_TIMER, mp_set_heater_timer_handle },   //定时加热: 设定时间到后自动关闭
+	{ M_CMD_SET_TUNE_MODE, mp_set_tune_mode_handle },         //设置模式
+	{ M_CMD_GET_APR_PCT, mp_get_apr_percent_handle },         //查询当前气压
+	{ M_CMD_MENUAL_CFG_APR, mp_manual_cfg_target_apr_handle },//手动控制气囊
+	{ M_CMD_GET_STRENGTH, mp_get_strength_handle },           //查询充气强度
+	{ M_CMD_SET_STRENGTH, mp_set_strength_handle },           //设置充气强度
+	{ M_CMD_DEV_INFO, mp_get_device_info_handle },            //上报设备信息
+	{ M_CMD_GET_WIFI_MAC_RSP, mp_get_wifi_mac_handle },       //获取WiFi MAC地址
+	{ M_CMD_HEATER_CTRL, mp_heater_ctrl_handle },             //加热器控制
+	{ M_CMD_GET_HEATER_CTRL, mp_get_heater_ctrl_handle },     //查询加热器当前控制档
+	{ M_CMD_NOTIFY_SNORING, mp_notify_snoring_handle },       //当前用户在打鼾
+	{ M_CMD_STOP_SNORING, mp_stop_snoring_handle },           //停止打鼾
+	{ M_CMD_SET_SIP, mp_set_sip_handle }, 				      //设置防静力损伤SIP
+	{ M_CMD_GET_SIP, mp_get_sip_handle },                     //查询防静力损伤SIP
 };
 
 m_role_t g_role = M_ROLE_MASTER;// 当前控制盒的角色
@@ -103,7 +106,6 @@ void mp_rx_downlink_data_handle( uint8_t *data, uint16_t length )//下行数据�
 	uint16_t offset;
 	uint16_t len_value;
 	
-
 	LOG("rx downlink data:");
 
 	offset = 0;
@@ -263,8 +265,7 @@ void mp_process_frame( uint8_t *data, uint16_t length )
 	{
 		for( i=0;i<ARRAY_SIZE(g_m_cmd_entrys); i++)
 		{
-			if((g_m_cmd_entrys[i].cmd == cmd )&&
-			    (g_m_cmd_entrys[i].handle))
+			if((g_m_cmd_entrys[i].cmd == cmd )&&(g_m_cmd_entrys[i].handle))
 			{
 				g_m_cmd_entrys[i].handle(data, length );
 
@@ -282,10 +283,10 @@ void mp_get_apr_handle( uint8_t *data, uint16_t length )
 
 void mp_get_tune_mode_handle( uint8_t *data, uint16_t length )
 {
-	uint8_t value[2];
+	uint8_t value[2];   
 	
-	value[0]= m_get_run_para_instance(PARTION_LEFT)->tune_mode;
-	value[1]= m_get_run_para_instance(PARTION_RIGHT)->tune_mode;
+	value[0]= m_get_run_para_instance(PARTION_LEFT)->tune_mode; //查询左床模式
+	value[1]= m_get_run_para_instance(PARTION_RIGHT)->tune_mode;//查询右床模式
 	
 	mp_build_and_send_frame( M_CMD_GET_TUNE_MODE_RSP, value, 2 );
 }
@@ -521,14 +522,14 @@ void mp_report_apr_percent_handle( uint8_t partion )
 	{
 		for(uint8_t i=0;i<MAX_ACL_NUM/2;i++)
 		{
-			apr_pct[i] = (uint8_t)(m_get_acm_instance((acl_id_t)i)->current_apr*100/MAX_APR);
+			apr_pct[i] = (uint8_t)(m_get_acm_instance((acl_id_t)i)->current_apr*100/MAX_APR);// 100% 为 100
 		}
 	}
 	else
 	{
 		for(uint8_t i=0;i<MAX_ACL_NUM/2;i++)
 		{
-			apr_pct[i] = (uint8_t)(m_get_acm_instance((acl_id_t)(MAX_ACL_NUM/2+i))->current_apr*100/MAX_APR);
+			apr_pct[i] = (uint8_t)(m_get_acm_instance((acl_id_t)(MAX_ACL_NUM/2+i))->current_apr*100/MAX_APR);// 100% 为 100
 		}
 	}
 
@@ -795,6 +796,67 @@ void mp_get_sip_handle( uint8_t *data, uint16_t length )
 	}
 	
 	mp_build_and_send_frame( M_CMD_GET_SIP_RSP, payload, 2 );
+}
+
+
+/* 加热等级(0-3) 对应的目标温度(℃), 0 表示关闭 */
+static uint8_t mp_heater_level_to_temp( uint8_t level )
+{
+	switch( level )
+	{
+		case 1:  return 30;
+		case 2:  return 40;
+		case 3:  return 50;
+		default: return 0;
+	}
+}
+
+void mp_set_heater_timer_handle( uint8_t *data, uint16_t length )/* 定时加热: 设定时间到后自动关闭 */
+{
+	uint8_t payload[2];  //左右床
+	uint8_t tmp_value; //温度档
+	uint16_t minutes; //分钟  
+
+	payload[0] = data[4]; 
+	payload[1] = 0;
+
+	/* 需要 partion + level + 2 字节时长, 即 LEN >= 4 */
+	if( length < 10 )
+	{
+		payload[1] = 1;
+	    mp_build_and_send_frame( M_CMD_SET_HEATER_TIMER_RSP, payload, 2 );
+		return;
+	}
+
+	minutes = BUILD_UINT16( data[7], data[6] );	/* data[6]=高字节, data[7]=低字节 */
+
+	if( ( PARTION_LEFT != data[4] ) && ( PARTION_RIGHT != data[4] ) )//无效的床位
+	{
+		payload[1] = 1; 
+	}
+	else if( data[5] > 3 )//无效的加热档位
+	{
+		payload[1] = 1;
+	}
+	else if( 0 == minutes )//无效的设置时间
+	{
+		payload[1] = 1;
+	}
+	else
+	{
+		tmp_value = mp_heater_level_to_temp( data[5] );
+
+		if( 0 == tmp_value )	/* 等级 0: 取消定时并关闭加热器 */
+		{
+			m_set_target_temperature( data[4], 0 );
+		}
+		else
+		{
+			m_set_target_temperature_with_timer( data[4], tmp_value, (uint32_t)minutes * 60 );
+		}
+	}
+
+	mp_build_and_send_frame( M_CMD_SET_HEATER_TIMER_RSP, payload, 2 );
 }
 
 

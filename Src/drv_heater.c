@@ -97,11 +97,11 @@ void m_ht_timer_callback(TimerHandle_t xTimer) //定时器回调函数
 	{
 		p_item = &g_ht_item[i];
 
-		if( 0 == p_item->dutyfactor )
+		if( 0 == p_item->dutyfactor )// 加热器关
 		{
 			HAL_GPIO_WritePin( p_item->port, p_item->pin, M_HEATER_OFF);   
 		}
-		else if( 100 == p_item->dutyfactor )
+		else if( 100 == p_item->dutyfactor ) // 加热器开
 		{
 			HAL_GPIO_WritePin( p_item->port, p_item->pin, M_HEATER_ON); 
 		}

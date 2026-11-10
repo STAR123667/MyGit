@@ -12,7 +12,7 @@
 
 #define DL_SOF	0xA5A5
 #define UL_SOF	0xB5B5
-#define MJ_EOF 		0x5E
+#define MJ_EOF 	0x5E
 
 #define MP_SUCCESS		0
 #define MP_FAIL			1
@@ -21,47 +21,50 @@
 #define MAX_BLE_FRAME_SIZE	255
 #define MIN_BLE_FRAME_SIZE	6
 
-#define M_CMD_GET_TUNE_MODE		0xE0
+#define M_CMD_GET_TUNE_MODE		0xE0   // 查询当前工作模式
 #define M_CMD_GET_TUNE_MODE_RSP	0xE0
 
-#define M_CMD_SET_TUNE_MODE		0xE1
+#define M_CMD_SET_TUNE_MODE		0xE1   // 设置当前工作模式   
 #define M_CMD_SET_TUNE_MODE_RSP	0xE1
 
-#define M_CMD_RPT_TUNNING_STATE	0xE2
+#define M_CMD_RPT_TUNNING_STATE	0xE2   // 接收实时调整的气囊位置
 
-#define M_CMD_GET_STRENGTH		0xE3
-#define M_CMD_GET_STRENGTH_RSP	0xE3
+#define M_CMD_GET_STRENGTH		0xE3   // 查询当前调节力度等级
+#define M_CMD_GET_STRENGTH_RSP	0xE3   
 
-#define M_CMD_SET_STRENGTH		0xE4
+#define M_CMD_SET_STRENGTH		0xE4   // 设置调节力度等级   
 #define M_CMD_SET_STRENGTH_RSP	0xE4
 
-#define M_CMD_AI_REPOT				0xE7
+#define M_CMD_AI_REPOT			0xE7   // 人体状态/生理参数数据
 
-#define M_CMD_DEV_INFO				0xE8
+#define M_CMD_DEV_INFO			0xE8   // 设备信息查询
 #define M_CMD_DEV_INFO_RRSP		0xE8
-
-#define M_CMD_HEATER_CTRL				0xEA
-#define M_CMD_HEATER_CTRL_RRSP		0xEA
-
-#define M_CMD_GET_HEATER_CTRL		0xEB
+    
+#define M_CMD_HEATER_CTRL		0xEA   // 控制加热器      
+#define M_CMD_HEATER_CTRL_RRSP	0xEA
+  
+#define M_CMD_GET_HEATER_CTRL		0xEB  // 查询加热控制
 #define M_CMD_GET_HEATER_CTRL_RRSP	0xEB
 
-#define M_CMD_SET_SIP					0xEC
+#define M_CMD_SET_SIP					0xEC // 设置 SIP
 #define M_CMD_SET_SIP_RSP				0xEC
 
-#define M_CMD_GET_SIP					0xED
+#define M_CMD_GET_SIP					0xED // 查询 SIP   
 #define M_CMD_GET_SIP_RSP				0xED
 
-#define M_CMD_GET_APR_PCT			0xF6
+#define M_CMD_SET_HEATER_TIMER			0xEE // 设置加热器定时器   
+#define M_CMD_SET_HEATER_TIMER_RSP		0xEE
+
+#define M_CMD_GET_APR_PCT			0xF6  // 获取身体各部位压力数据
 #define M_CMD_GET_APR_PCT_RSP		0xF6
 
-#define M_CMD_MENUAL_CFG_APR		0xF7
+#define M_CMD_MENUAL_CFG_APR		0xF7  // 手动设置各部位的软硬度
 
-#define M_CMD_GET_WIFI_MAC		0x7F
+#define M_CMD_GET_WIFI_MAC		0x7F      // 查询WiFi MAC地址
 #define M_CMD_GET_WIFI_MAC_RSP	0x7F
 
-#define M_CMD_NOTIFY_SNORING		0xC0
-#define M_CMD_STOP_SNORING		0xC1
+#define M_CMD_NOTIFY_SNORING	0xC0      // 通知打鼾
+#define M_CMD_STOP_SNORING		0xC1      // 停止打鼾
 
 
 /*******  自行添加宏定义 *******/
@@ -90,9 +93,9 @@
 
 typedef enum
 {
-	M_ROLE_MASTER = 0,
-	M_ROLE_SLAVE,	
-}m_role_t;
+	M_ROLE_MASTER = 0, 
+	M_ROLE_SLAVE,
+}m_role_t; 
 
 typedef void(*m_cmd_handle_t)( uint8_t *data, uint16_t length);
 

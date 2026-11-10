@@ -81,17 +81,17 @@ static uint16_t g_sip_sec_cnt[2]={0,0};
 
 static const acm_msg_handle_entry_t g_acm_msg_handle_tbl[]=
 {
-	{ACM_MSG_TYPE_UPDATE_APR, 		m_acm_air_pressure_update_handle },   // 更新气压
-	{ACM_MSG_TYPE_SET_TARGET_APR, 	m_acm_set_target_apr_handle },        // 设置目标气压
-	{ACM_MSG_TYPE_DUMP_INFO, 		m_dump_system_info_handle },          // 打印系统信息
-	//{ACM_MSG_TYPE_UPDATE_CURRENT, 	m_acm_current_update_handle },
-	{ACM_MSG_TYPE_STOP_APR_TUNNING, 	m_acm_stop_apr_tunning_handle },  // 停止apr调谐
-	{ACM_MSG_TYPE_SET_TARGET_APR_SEQ, 	m_acm_set_target_apr_seq_handle },// 设置目标apr序列
-	{ACM_MSG_TYPE_SET_PARA, 	m_acm_set_run_para_handle },              // 设置运行参数
+	{ACM_MSG_TYPE_UPDATE_APR, 		m_acm_air_pressure_update_handle },     // 气压检测反馈 
+	{ACM_MSG_TYPE_SET_TARGET_APR, 	m_acm_set_target_apr_handle },        // 设置气囊的目标气压
+	{ACM_MSG_TYPE_DUMP_INFO, 		m_dump_system_info_handle },              // 打印每一路气囊的信息
+	//{ACM_MSG_TYPE_UPDATE_CURRENT, 	m_acm_current_update_handle },      // 左气泵和右气泵和电磁阀3路电流检测  
+	{ACM_MSG_TYPE_STOP_APR_TUNNING, 	m_acm_stop_apr_tunning_handle },    // 停止所有气囊的调节 
+	{ACM_MSG_TYPE_SET_TARGET_APR_SEQ, 	m_acm_set_target_apr_seq_handle },// 并行调节多路气囊
+	{ACM_MSG_TYPE_SET_PARA, 	m_acm_set_run_para_handle },                // 设置运行参数
 
 	{ ACM_MSG_TYPE_SECOND_TICK, m_acm_second_tick_handle },               // 秒级定时器
-	{ ACM_MSG_TYPE_SWITCH_MODE, m_acm_switch_function_handle },           // 切换功能
-	{ ACM_MSG_TYPE_AI_CTRL, m_acm_ai_ctrl_handle },                       // AI控制处理
+	{ ACM_MSG_TYPE_SWITCH_MODE, m_acm_switch_function_handle },           // 模式切换
+	{ ACM_MSG_TYPE_AI_CTRL, m_acm_ai_ctrl_handle },                       // AI模块指令响应
 	
 };
 
@@ -326,7 +326,7 @@ acm_t g_acm_table[]=
 func_mng_t g_function_mng=
 {
 	.partion = PARTION_MAX,       // 分区数 
-	.function = TUNE_MODE_AUTO,   // 工作模式
+	.function = TUNE_MODE_AUTO,   // 自动模式，处理AI模块数据。
 };
 
 static uint8_t g_strength[2] = { M_STRENGH_STRONG, M_STRENGH_STRONG };// 新增：系统强度
@@ -354,7 +354,7 @@ static uint8_t g_force_report_apr = 0;   // 新增：姿态切换时置1，持�
 void m_acm_init( void )        
 {
 	ring_buffer_init( &tune_queue, tune_pool, sizeof(tune_pool));//初始化调谐队列
-
+  
 	for( uint8_t i=0;i<MAX_ACL_NUM;i++)
 	{
 		ring_buffer_init(&g_apr_queue[i], (uint8_t *)g_apr_pool[i], (sizeof(float))*WINDOW_SIZE+1 );//初始化apr队列
@@ -659,7 +659,7 @@ void m_acm_stop_apr_tunning( void )// 停止调谐
 	m_acm_post_msg( ACM_MSG_TYPE_STOP_APR_TUNNING, NULL, false );
 }	
 
-void m_dump_system_info_handle(acm_msg_content_t *content)
+void m_dump_system_info_handle(acm_msg_content_t *content)// 打印系统信息
 {
 	acm_t *ctrl = g_acm_table;
 
@@ -672,7 +672,7 @@ void m_dump_system_info_handle(acm_msg_content_t *content)
 }
 
 
-void m_acm_stop_apr_tunning_handle(acm_msg_content_t *content)
+void m_acm_stop_apr_tunning_handle(acm_msg_content_t *content)// 停止调谐
 {
 	uint8_t i;
 	acm_t *p;
@@ -692,7 +692,7 @@ void m_acm_stop_apr_tunning_handle(acm_msg_content_t *content)
 	drv_air_pump_control(RIGHT_AIR_PUM_PORT, RIGHT_AIR_PUM_PIN, M_PUMP_OFF);
 	drv_air_pump_control(LEFT_AIR_PUM_PORT, LEFT_AIR_PUM_PIN, M_PUMP_OFF);
 }
-void m_acm_refress_comparison(void)
+void m_acm_refress_comparison(void)// 比较气压值
 {
 	uint8_t i;
 	acm_t *p;
@@ -832,8 +832,8 @@ void m_acm_refress_comparison(void)
 					vv_mask |=(1<<i);
 				}
 			}
-			printf("id: %d, sv_mask: 0x%08x, current: %f kpa --> target %f kpa\r\n", i, 
-							m_get_sv_state_mask(),p->current_apr, p->target_apr);
+//			printf("id: %d, sv_mask: 0x%08x, current: %f kpa --> target %f kpa\r\n", i, 
+//							m_get_sv_state_mask(),p->current_apr, p->target_apr);
 		}
 	}
 
@@ -847,11 +847,9 @@ void m_acm_refress_comparison(void)
 		{
 			if(PARTION_LEFT == g_function_mng.partion)		
 			{
-				if(( TUNE_MODE_RELAX <= g_function_mng.function)&&
-				    (g_function_mng.function<TUNE_MODE_MAX)&&
-				    (g_function_mng.function != TUNE_MODE_EXPERIENCE))
+				if(( TUNE_MODE_RELAX <= g_function_mng.function) && (g_function_mng.function<TUNE_MODE_MAX) && (g_function_mng.function != TUNE_MODE_EXPERIENCE))
 				{
-					mode_match = true;
+					mode_match = true; // 左床模式 
 				}
 			}
 			
@@ -865,11 +863,9 @@ void m_acm_refress_comparison(void)
 		{
 			if(PARTION_RIGHT == g_function_mng.partion)		
 			{
-				if(( TUNE_MODE_RELAX <= g_function_mng.function)&&
-				    (g_function_mng.function<TUNE_MODE_MAX)&&
-				    (g_function_mng.function != TUNE_MODE_EXPERIENCE))
+				if(( TUNE_MODE_RELAX <= g_function_mng.function) && (g_function_mng.function<TUNE_MODE_MAX) && (g_function_mng.function != TUNE_MODE_EXPERIENCE))
 				{
-					mode_match = true;
+					mode_match = true; // 右床模式 
 				}
 			}
 			
@@ -888,7 +884,7 @@ void m_acm_refress_comparison(void)
 	if(0==vv_mask )
 	{
 		#if 1
-		drv_solenoid_valve_control(VV_ID_01, M_SV_OFF);
+		drv_solenoid_valve_control(VV_ID_01, M_SV_OFF);//3路放气阀关闭
 		drv_solenoid_valve_control(VV_ID_02, M_SV_OFF);
 		drv_solenoid_valve_control(VV_ID_03, M_SV_OFF);
 		#endif
@@ -901,7 +897,7 @@ void m_acm_refress_comparison(void)
 		else
 		{
 			{
-				if(pump_mask&0xFF)
+				if(pump_mask&0xFF)//左床气泵力度
 				{
 					if(M_STRENGH_SOFT == g_strength[0])
 					{
@@ -926,7 +922,7 @@ void m_acm_refress_comparison(void)
 					}
 				}
 
-				if(pump_mask&0xFF00)
+				if(pump_mask&0xFF00)//右床气泵力度
 				{
 					if(M_STRENGH_SOFT == g_strength[1])
 					{
@@ -1048,7 +1044,7 @@ uint8_t m_is_all_air_cell_stable(void)
 void m_tune_tick(void)
 {
 	if(( false == m_is_air_cell_tunning())&&
-	    ( true == m_is_all_air_cell_stable()))
+	    ( true == m_is_all_air_cell_stable()))//停止充放气和平稳了
 	{
 		if( ring_buffer_get_data_len( &tune_queue ) >= sizeof( tune_item_t ) )
 		{
@@ -1160,7 +1156,7 @@ void m_acl_stable_handler( uint8_t acl_id )
 acm_run_para_t *m_get_run_para_instance(uint8_t partion )
 {
 	if( ( PARTION_LEFT == partion )||
-	     ( PARTION_RIGHT == partion ))
+	     ( PARTION_RIGHT == partion ))// 检查分区是否在范围内
 		
 	{
 		return &g_acm_run_para[partion-1];
@@ -3424,7 +3420,7 @@ void m_acm_switch_function_handle(acm_msg_content_t *content)
 	g_function_mng.function = content->switch_function.function;
 	g_function_mng.partion = content->switch_function.partion;
 	g_function_mng.total_sec_cnt=0;
-	m_acm_stop_apr_tunning_direct();
+	m_acm_stop_apr_tunning_direct();//气囊所有调节停止掉
 
 	ring_buffer_clean( &tune_queue);
 	
@@ -3436,12 +3432,12 @@ void m_acm_switch_function_handle(acm_msg_content_t *content)
 
 	LOG("@@@@@ switch to mode: %d", g_function_mng.function);
 
-	if(TUNE_MODE_MENUAL== g_function_mng.function )
+	if(TUNE_MODE_MENUAL== g_function_mng.function )//手动模式
 	{
-		m_reset_posture(g_function_mng.partion);
+		m_reset_posture(g_function_mng.partion);//
 	}
 	
-	if(TUNE_MODE_EXPERIENCE == g_function_mng.function )
+	if(TUNE_MODE_EXPERIENCE == g_function_mng.function )//一键体验模式
 	{
 		g_function_mng.function = TUNE_MODE_RELAX;
 		g_experience_mode_index = TUNE_MODE_RELAX;
@@ -3459,7 +3455,7 @@ void m_acm_switch_function_handle(acm_msg_content_t *content)
 		{
 			acm_msg_set_apr_seq_t  apr_seq;
 			
-			g_function_mng.para.anti_snore_1_para.total_sec = ZHS_RELAX_MODE_TOTAL_SEC;
+			g_function_mng.para.anti_snore_1_para.total_sec = ZHS_RELAX_MODE_TOTAL_SEC;//总的秒数
 			g_function_mng.para.anti_snore_1_para.action = ACL_ACTION_INFLATE,
 			g_function_mng.para.anti_snore_1_para.sec_cnt=0;
 			g_function_mng.para.anti_snore_1_para.step=1;
@@ -3490,7 +3486,7 @@ void m_acm_switch_function_handle(acm_msg_content_t *content)
 					apr_seq.target_apr[8]);
 			}
 			
-			m_acm_set_target_apr_seq( &apr_seq );	
+			m_acm_set_target_apr_seq( &apr_seq );	//多路控制气囊
 		}
 		break;
 
