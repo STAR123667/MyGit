@@ -160,7 +160,7 @@ void mp_rx_downlink_data_handle( uint8_t *data, uint16_t length )//下行数据�
 				}
 			}
 		}
-
+    
 		if((0xA5 == p[0])&&(0xA5 == p[1]))
 		{
 			if( length - offset >= 12 )// 剩余帧长度大于等于帧长度+12
