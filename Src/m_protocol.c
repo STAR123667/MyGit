@@ -119,7 +119,7 @@ void mp_rx_downlink_data_handle( uint8_t *data, uint16_t length )//下行数据�
 		{
 			uint8_t cmd_v = p[2];
 			uint8_t len_v = p[3];
-
+            /*解析云端下发查询版本号*/
 			if( (M_CMD_VERSION_QUERY == cmd_v) && (0x01 == len_v) )
 			{
 				uint8_t obj  = p[4];
@@ -142,7 +142,7 @@ void mp_rx_downlink_data_handle( uint8_t *data, uint16_t length )//下行数据�
 				}
 			}
 		}
-
+        /*解析APP/云端下发协议*/
 		if((0xA5 == p[0])&&(0xA5 == p[1]))
 		{
 			len_value = p[3];
@@ -160,7 +160,7 @@ void mp_rx_downlink_data_handle( uint8_t *data, uint16_t length )//下行数据�
 				}
 			}
 		}
-    
+        /*解析AI模块下发协议*/
 		if((0xA5 == p[0])&&(0xA5 == p[1]))
 		{
 			if( length - offset >= 12 )// 剩余帧长度大于等于帧长度+12

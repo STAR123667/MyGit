@@ -129,41 +129,41 @@ void m_collector_thread(void const *argument)// ADC采集线程20ms，每个通�
 					volt[ch] /= ADC_TIMES_PER_ROUND;
 				}
 
-//				update_apr.cap_mv[0] = volt[9];  //ADC_左头
-//				update_apr.cap_mv[1] = volt[15]; //ADC_左肩
-//				update_apr.cap_mv[2] = volt[7];  //ADC_左腰
-//				update_apr.cap_mv[3] = volt[5];  //ADC_左臂1
-//				update_apr.cap_mv[4] = volt[8];  //ADC_右头  
-//				update_apr.cap_mv[5] = volt[14]; //ADC_右肩 
-//				update_apr.cap_mv[6] = volt[6];  //ADC_右腰 
-//				
-//				update_apr.cap_mv[7] =  volt[4]; //ADC_右臂1  
-//				update_apr.cap_mv[8] =  volt[3]; //ADC_左臂2
-//				update_apr.cap_mv[9] =  volt[1]; //ADC_左臂3
-//				update_apr.cap_mv[10] = volt[13];//ADC_左臂4
-//				update_apr.cap_mv[11] = volt[11];//ADC_左小腿
-//				update_apr.cap_mv[12] = volt[2]; //ADC_右臂2
-//				update_apr.cap_mv[13] = volt[0]; //ADC_右臂3
-//				update_apr.cap_mv[14] = volt[12];//ADC_右臂4
-//				update_apr.cap_mv[15] = volt[10];//ADC_右小腿
-
-				update_apr.cap_mv[0] = volt[9]; //电磁阀_左头
-				update_apr.cap_mv[1] = volt[15];//电磁阀_左肩
-				update_apr.cap_mv[2] = volt[7]; //电磁阀_左腰
-				update_apr.cap_mv[3] = volt[5]; //电磁阀_左臂-1
-				update_apr.cap_mv[4] = volt[3]; //电磁阀_左臂-2
-				update_apr.cap_mv[5] = volt[1]; //电磁阀_左臂-3
-				update_apr.cap_mv[6] = volt[13];//电磁阀_左臂-4
+				update_apr.cap_mv[0] = volt[9];  //ADC_左头
+				update_apr.cap_mv[1] = volt[15]; //ADC_左肩
+				update_apr.cap_mv[2] = volt[7];  //ADC_左腰
+				update_apr.cap_mv[3] = volt[5];  //ADC_左臂1
+				update_apr.cap_mv[4] = volt[8];  //ADC_右头  
+				update_apr.cap_mv[5] = volt[14]; //ADC_右肩 
+				update_apr.cap_mv[6] = volt[6];  //ADC_右腰 
 				
-				update_apr.cap_mv[7] = volt[11];//电磁阀_左小腿
-				update_apr.cap_mv[8] = volt[8]; //电磁阀_右头
-				update_apr.cap_mv[9] = volt[14];//电磁阀_右肩
-				update_apr.cap_mv[10] = volt[6];//电磁阀_右腰
-				update_apr.cap_mv[11] = volt[4];//电磁阀_右臂-1
-				update_apr.cap_mv[12] = volt[2];//电磁阀_右臂-2
-				update_apr.cap_mv[13] = volt[0];//电磁阀_右臂-3
-				update_apr.cap_mv[14] = volt[12];//电磁阀_右臂-4
-				update_apr.cap_mv[15] = volt[10];//电磁阀_右小腿 
+				update_apr.cap_mv[7] =  volt[4]; //ADC_右臂1  
+				update_apr.cap_mv[8] =  volt[3]; //ADC_左臂2
+				update_apr.cap_mv[9] =  volt[1]; //ADC_左臂3
+				update_apr.cap_mv[10] = volt[13];//ADC_左臂4
+				update_apr.cap_mv[11] = volt[11];//ADC_左小腿
+				update_apr.cap_mv[12] = volt[2]; //ADC_右臂2
+				update_apr.cap_mv[13] = volt[0]; //ADC_右臂3
+				update_apr.cap_mv[14] = volt[12];//ADC_右臂4
+				update_apr.cap_mv[15] = volt[10];//ADC_右小腿
+
+//				update_apr.cap_mv[0] = volt[9]; //电磁阀_左头
+//				update_apr.cap_mv[1] = volt[15];//电磁阀_左肩
+//				update_apr.cap_mv[2] = volt[7]; //电磁阀_左腰
+//				update_apr.cap_mv[3] = volt[5]; //电磁阀_左臂-1
+//				update_apr.cap_mv[4] = volt[3]; //电磁阀_左臂-2
+//				update_apr.cap_mv[5] = volt[1]; //电磁阀_左臂-3
+//				update_apr.cap_mv[6] = volt[13];//电磁阀_左臂-4
+//				
+//				update_apr.cap_mv[7] = volt[11];//电磁阀_左小腿
+//				update_apr.cap_mv[8] = volt[8]; //电磁阀_右头
+//				update_apr.cap_mv[9] = volt[14];//电磁阀_右肩
+//				update_apr.cap_mv[10] = volt[6];//电磁阀_右腰
+//				update_apr.cap_mv[11] = volt[4];//电磁阀_右臂-1
+//				update_apr.cap_mv[12] = volt[2];//电磁阀_右臂-2
+//				update_apr.cap_mv[13] = volt[0];//电磁阀_右臂-3
+//				update_apr.cap_mv[14] = volt[12];//电磁阀_右臂-4
+//				update_apr.cap_mv[15] = volt[10];//电磁阀_右小腿 
 				
 				for(uint8_t i=0; i<ADC_CH_NUM; i++)
         {

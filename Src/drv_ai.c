@@ -48,7 +48,7 @@ void drv_ai_init(void)
 
 void drv_ai_process_frame( uint8_t *frame, uint16_t length )
 {
-	static uint8_t leave_bed_cnt[2]={0,0};
+	static uint8_t leave_bed_cnt[2]={0,0}; 
 	#if 1
 	uint8_t status=0;
 	uint8_t *left_apr_list;
@@ -57,14 +57,13 @@ void drv_ai_process_frame( uint8_t *frame, uint16_t length )
 	acm_msg_set_apr_seq_t  apr_seq;
 
 	posture_old[0] = g_sensor_status[0].posture;
-	posture_old[1] = g_sensor_status[1].posture;
+	posture_old[1] = g_sensor_status[1].posture;// 
 	
 	if(drv_ai_is_frame_valaid(frame, length) == true)
 	{
-		if( ( 58 == length )&&(0x02 == frame[12])&&(0x10 == frame[13]))
+		if( (58 == length )&&(0x02 == frame[12])&&(0x10 == frame[13]) ) // AI control
 		{
-			if((true == m_is_ai_action_doing())&&
-			    (false == m_is_tunning_queue_empty()))
+			if((true == m_is_ai_action_doing())&&(false == m_is_tunning_queue_empty()))// 正在执行AI控制，忽略
 			{
 				LOG("@@@@@ doing ai ctrl, ignore");
 			}
@@ -73,8 +72,8 @@ void drv_ai_process_frame( uint8_t *frame, uint16_t length )
 				
 				acm_msg_ai_ctrl_t ai_ctrl;
 			
-				left_apr_list = &frame[36];
-				right_apr_list = &frame[45];
+				left_apr_list = &frame[36];// 
+				right_apr_list = &frame[45];//
 			
 				ai_ctrl.mask = 0;
 
@@ -107,19 +106,19 @@ void drv_ai_process_frame( uint8_t *frame, uint16_t length )
 				
 				for(uint8_t i=0;i<2;i++)
 				{
-					if( POSTURE_NO_PERSON == g_sensor_status[i].posture )
+					if( POSTURE_NO_PERSON == g_sensor_status[i].posture )  // 无效姿势
 					{
-						if(leave_bed_cnt[i]<5)
+						if(leave_bed_cnt[i]<5) // 离开床5次，气囊并行调节
 						{
 							leave_bed_cnt[i]++;
-							if(5==leave_bed_cnt[i])
+							if(5==leave_bed_cnt[i]) /* 连续 5 帧无人判定离床 */
 							{
 								if(0==i)	
 								{
 									for(uint8_t n=1;n<8;n++)
 									{
-										apr_seq.mask  |= BIT(n);
-										apr_seq.target_apr[n] = MAX_APR*0.5f;
+										apr_seq.mask  |= BIT(n); // 并行调节
+										apr_seq.target_apr[n] = MAX_APR*0.5f; /* 释放到半压 */
 									}
 								}
 								
@@ -127,15 +126,15 @@ void drv_ai_process_frame( uint8_t *frame, uint16_t length )
 								{
 									for(uint8_t n=9;n<16;n++)
 									{
-										apr_seq.mask  |= BIT(n);
-										apr_seq.target_apr[n] = MAX_APR*0.5f;
+										apr_seq.mask  |= BIT(n); // 并行调节
+										apr_seq.target_apr[n] = MAX_APR*0.5f; /* 释放到半压 */
 									}
 								}
 								
 							}
 						}
 					}
-					else
+					else // 有效姿势
 					{
 						leave_bed_cnt[i] = 0;
 					}

@@ -2,18 +2,22 @@
 #include "m_micro.h"
 #include "m_log.h"
 #include "drv_heater.h"
+#include "drv_ai.h"
 #include "m_acm.h"
 
 
 extern UART_HandleTypeDef huart5;
 
-static uint16_t g_target_tmp[2]={0,0};
+static uint16_t g_target_tmp[2]={0,0};         	/* 目标温度 */
 static uint32_t g_heater_remain_sec[2]={0,0};	/* 定时加热剩余秒数, 0 表示未定时 */
+static uint32_t g_out_bed_sec[2]={0,0};			/* 定时加热期间连续离床秒数 */
+
+#define HEATER_OUT_BED_OFF_SEC	600				/* 连续离床 10 分钟关闭加热器 */
 
 static unsigned int CRC_16(unsigned char *str,unsigned int usDataLen);
 static uint8_t b_is_frame_valaid(uint8_t *frame, uint16_t length);
 
-
+    
 void drv_tmp_sensor_init(void)
 {
 
@@ -189,6 +193,7 @@ void m_set_target_temperature(uint8_t partion, uint8_t tmp )
 	if( 0 == tmp )	/* 目标温度清零时同时取消定时加热 */
 	{
 		g_heater_remain_sec[partion-1] = 0;
+		g_out_bed_sec[partion-1] = 0;
 	}
 }
 
@@ -203,6 +208,7 @@ void m_set_target_temperature_with_timer(uint8_t partion, uint8_t tmp, uint32_t 
 	m_set_target_temperature( partion, tmp );
 
 	g_heater_remain_sec[partion-1] = ( tmp > 0 ) ? seconds : 0;
+	g_out_bed_sec[partion-1] = 0;	/* 重新开始定时加热时清零离床计时 */
 }
 
 
@@ -212,15 +218,46 @@ void m_heater_timer_tick_1s(void)
 	{
 		if( g_heater_remain_sec[n] > 0 )
 		{
+			sensor_status_t *status = m_get_ai_sensor_status( n+1 );
+
+			/* 定时加热期间检测离床: 连续离床 >= 10 分钟则关闭该分区加热器 */
+			if( (NULL != status)&&((POSTURE_LEAVE == status->posture)||(POSTURE_NO_PERSON == status->posture)) )
+			{
+				if( g_out_bed_sec[n] < HEATER_OUT_BED_OFF_SEC )
+				{
+					g_out_bed_sec[n]++;
+				}
+
+				if( g_out_bed_sec[n] >= HEATER_OUT_BED_OFF_SEC )
+				{
+					g_target_tmp[n] = 0;
+					g_heater_remain_sec[n] = 0;
+					g_out_bed_sec[n] = 0;
+					drv_heater_ctrl( n+1, 0 );
+
+					LOG("heater %d out of bed 10min, turn off", n+1);
+					continue;
+				}
+			}
+			else	/* 有人在床, 离床计时清零 */
+			{
+				g_out_bed_sec[n] = 0;
+			}
+
 			g_heater_remain_sec[n]--;
 
 			if( 0 == g_heater_remain_sec[n] )	/* 到达设定时间, 关闭加热器 */
 			{
 				g_target_tmp[n] = 0;
+				g_out_bed_sec[n] = 0;
 				drv_heater_ctrl( n+1, 0 );
 
 				LOG("heater %d timer expired, turn off", n+1);
 			}
+		}
+		else
+		{
+			g_out_bed_sec[n] = 0;
 		}
 	}
 }

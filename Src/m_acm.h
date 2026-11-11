@@ -49,16 +49,15 @@
 #define VV_DELAY_MS	(200)
 
 #if 1
-#define ZHS_RELAX_MODE_TOTAL_SEC					(60*10)
+#define ZHS_RELAX_MODE_TOTAL_SEC				(60*10) //深海潮汐浮浪模式
 #define ZHS_RELAX_MODE_INFLATE_SEC				2		//14 per min	
 #define ZHS_RELAX_MODE_DEFLATE_SEC				2
+  
 
-
-#define ZHS_PUSH_SPINE_TOTAL_SEC				(60*10)
-#define ZHS_SPA_MODE_TOTAL_SEC				(60*10)
-#define ZHS_SLEEP_ENHANCE_MODE_TOTAL_SEC		(60*10)
-#define ZHS_WAKEUP_MODE_TOTAL_SEC			(60*2)
-
+#define ZHS_PUSH_SPINE_TOTAL_SEC			   	(60*10) //臂腿净排模式
+#define ZHS_SPA_MODE_TOTAL_SEC				    (60*10) //云柔全身速舒模式 
+#define ZHS_SLEEP_ENHANCE_MODE_TOTAL_SEC		(60*10) //浅澜速眠模式 
+#define ZHS_WAKEUP_MODE_TOTAL_SEC			    (60*2) 
 
 
 
@@ -91,14 +90,14 @@
 
 
 
-#define ZHS_RPT_TYPE_CURRENT_APR					0
+#define ZHS_RPT_TYPE_CURRENT_APR				0
 #define ZHS_RPT_TYPE_TARGET_APR					1
 
 #define M_STRENGH_SOFT							0x01
 #define M_STRENGH_STAND							0x02
-#define M_STRENGH_STRONG							0x03
+#define M_STRENGH_STRONG					    0x03
 
-#define HIGH_PWR_TIM_CNT		500
+#define HIGH_PWR_TIM_CNT	500
 #define STAND_PWR_TIM_CNT	5000
 #define LOW_PWR_TIM_CNT		5000
 
@@ -107,7 +106,7 @@ typedef enum
 	MTRS_STATE_EMPTY=0,
 	MTRS_STATE_STABLE,
 	MTRS_STATE_MOTION,	
-}mtrs_state_t;
+}mtrs_state_t;//气囊状态
 
 typedef enum
 {
@@ -129,7 +128,7 @@ typedef enum
 	ACL_ID_16,
 	ACL_ID_MAX,
 	ACL_ID_INVALAID=0xFF
-}acl_id_t;
+}acl_id_t;//气囊编号
 
 typedef float acl_apr_t[MAX_ACL_NUM];
 
@@ -138,7 +137,7 @@ typedef struct
 	float left_sole_current;
 	float right_sole_current;
 	float pump_current;
-}acm_current_t;
+}acm_current_t;//当前气囊的电流值
 
 typedef enum
 {
@@ -154,27 +153,27 @@ typedef enum
 	ACM_MSG_TYPE_SECOND_TICK,
 	ACM_MSG_TYPE_SWITCH_MODE,
 	ACM_MSG_TYPE_AI_CTRL,
-}acm_msg_type_t;
+}acm_msg_type_t;//消息类型
 
 typedef enum
 {
-	TUNE_MODE_UNKONOWN=0,
-	TUNE_MODE_MENUAL=1,
-	TUNE_MODE_AUTO,
-	TUNE_MODE_RELAX,
-	TUNE_MODE_PUSH_SPINE,			//TUNE_MODE_WAWIST_MASSAGE,
-	TUNE_MODE_SPA,
-	TUNE_MODE_SLEEP_ENHANCE,
-	//TUNE_MODE_FLOAT,
-	TUNE_MODE_EXPERIENCE,
-	TUNE_MODE_WAKEUP,
-	TUNE_MODE_ANTI_SNORING_1,		/*ͷ��̧��*/
-	TUNE_MODE_ANTI_SNORING_2,		/*ҡ��*/
-	TUNE_MODE_ANTI_SNORING_3,		/*�β����*/
-	TUNE_MODE_ANTI_SNORING_4,		/*����*/
-	//TUNE_MOE_SIP,							/*Static Injury Prevention Mode*/
-	TUNE_MODE_MAX
-}tune_mode_t;
+	TUNE_MODE_UNKONOWN=0,    // 未知模式
+	TUNE_MODE_MENUAL=1,      // 手动模式
+	TUNE_MODE_AUTO,          // 自动模式
+	TUNE_MODE_RELAX,         // 放松模式
+	TUNE_MODE_PUSH_SPINE,    // 推背模式
+	TUNE_MODE_SPA,           // SPA模式
+	TUNE_MODE_SLEEP_ENHANCE, // 助眠模式
+	//TUNE_MODE_FLOAT, 
+	TUNE_MODE_EXPERIENCE,    // 体验模式
+	TUNE_MODE_WAKEUP,        // 唤醒模式
+	TUNE_MODE_ANTI_SNORING_1,// 止鼾模式1
+	TUNE_MODE_ANTI_SNORING_2,// 止鼾模式2
+	TUNE_MODE_ANTI_SNORING_3,// 止鼾模式3
+	TUNE_MODE_ANTI_SNORING_4,// 止鼾模式4
+	//TUNE_MOE_SIP,			 /*Static Injury Prevention Mode*/
+	TUNE_MODE_MAX            // 最大模式
+}tune_mode_t;//模式类型
 
 
 typedef struct 
@@ -185,44 +184,44 @@ typedef struct
 typedef struct
 {
 	uint32_t acl_mask;
-	float target_apr;
-}tune_item_t;
+	float target_apr; 
+}tune_item_t;//调节项
 
 typedef struct 
 {
 	float target_apr[MAX_ACL_NUM];
 	uint32_t mask;
-}acm_msg_set_apr_seq_t;
+}acm_msg_set_apr_seq_t;//设置气压序列
 typedef struct 
 {
 	float target_apr;
 	uint32_t acl_mask;
-}acm_msg_set_apr_t;
+}acm_msg_set_apr_t;//设置单个气囊的目标气压
 
 typedef struct 
 {
 	float cur_mv[3];
-}acm_msg_update_current_t;
+}acm_msg_update_current_t;//当前气囊的电流值
 
 typedef struct 
 {
 	uint32_t item;
-	uint8_t value[4];
-	uint8_t len;
-	uint8_t partion;
-}acm_msg_set_para_t;
+	uint8_t value[4]; //参数值
+	uint8_t len;      //参数长度
+	uint8_t partion;  //左床还是右床
+}acm_msg_set_para_t;//设置参数
 
 typedef struct 
 {
-	uint8_t partion;
-	tune_mode_t function;
-}acm_msg_switch_function_t;
+	uint8_t partion;       //左床还是右床
+	tune_mode_t function;  //当前对应执行的模式
+}acm_msg_switch_function_t;//切换模式
 
 typedef struct 
 {
-	float target_apr[MAX_ACL_NUM];
-	uint32_t mask;
-}acm_msg_ai_ctrl_t;
+	float target_apr[MAX_ACL_NUM];// 目标气压序列
+	uint32_t mask;//调节项
+}acm_msg_ai_ctrl_t;//AI控制
 
 typedef union
 {
@@ -233,13 +232,13 @@ typedef union
 	acm_msg_set_para_t set_para;
 	acm_msg_switch_function_t switch_function;
 	acm_msg_ai_ctrl_t ai_ctrl;
-}acm_msg_content_t;
+}acm_msg_content_t;//消息体
 
 typedef struct
 {
 	acm_msg_type_t type;
 	acm_msg_content_t content;
-}acm_msg_t;
+}acm_msg_t;//消息结构体
 
 typedef void(*acm_msg_handle_t)(acm_msg_content_t *content);
 
@@ -247,7 +246,7 @@ typedef struct
 {
 	acm_msg_type_t type;
 	acm_msg_handle_t handle;
-}acm_msg_handle_entry_t;
+}acm_msg_handle_entry_t;//消息处理函数表
 
 
 typedef struct
@@ -263,25 +262,25 @@ typedef struct
 	float avg_apr_stable;//稳定状态后的平均气压
 	uint8_t exceed_cnt;  //稳定状态计数
 	uint8_t sv_delay_cnt;//电磁阀充气延时计数
-}acm_t;
+}acm_t;//气囊结构体
 
 typedef enum
 {
-	ACL_ACTION_INFLATE,
-	ACL_ACTION_DEFLATE,	
-}acl_action_t;
+	ACL_ACTION_INFLATE,//充气
+	ACL_ACTION_DEFLATE,//放气
+}acl_action_t;//气囊动作
 
 typedef struct
 {
-	tune_mode_t tune_mode;
-}acm_run_para_t;
+	tune_mode_t tune_mode;//当前对应执行的模式
+}acm_run_para_t;//运行参数
 
 
 typedef enum
 {
 	TMG_STATE_ACTIVE=0,
-	TMG_STATE_IDLE
-}tmg_state_t;
+	TMG_STATE_IDLE   
+}tmg_state_t;//定时器状态
 
 
 typedef struct 
@@ -291,7 +290,7 @@ typedef struct
 	uint8_t step;
 	acl_action_t action;
 	uint8_t loop_cnt;
-}func_relax_para_t;
+}func_relax_para_t;//放松模式 
 
 typedef struct 
 {
@@ -299,7 +298,7 @@ typedef struct
 	uint32_t total_sec;
 	uint8_t step;
 	acl_action_t action;
-}func_experience_para_t;
+}func_experience_para_t;//体验模式
 
 typedef struct 
 {
@@ -307,7 +306,7 @@ typedef struct
 	uint32_t total_sec;
 	uint8_t step;
 	acl_action_t action;
-}func_standard_para_t;
+}func_standard_para_t;//标准模式
 
 typedef struct 
 {
@@ -331,7 +330,7 @@ typedef struct
 	uint32_t total_sec;
 	uint8_t step;
 	acl_action_t action;
-}func_float_para_t;
+}func_float_para_t;//清流模式
 
 
 typedef struct 
@@ -362,11 +361,11 @@ typedef struct
 
 typedef struct 
 {
-	uint32_t sec_cnt;
-	uint32_t total_sec;
-	uint8_t step;
-	uint8_t shake_cnt;
-	acl_action_t action;
+	uint32_t sec_cnt;    //总执行时间
+	uint32_t total_sec;  //总执行时间
+	uint8_t step;        //当前执行的步骤
+	uint8_t shake_cnt;   //电磁阀充气延时计数
+	acl_action_t action; //当前执行的步骤
 }func_anti_snore_1_para_t;//止鼾模式1
 
 typedef struct 
@@ -384,7 +383,7 @@ typedef struct
 	uint32_t total_sec;
 	uint8_t step;
 	acl_action_t action;
-}func_anti_snore_3_para_t;
+}func_anti_snore_3_para_t;//止鼾模式3
 
 typedef struct 
 {
@@ -393,8 +392,7 @@ typedef struct
 	uint8_t step;
 	uint8_t shake_cnt;
 	acl_action_t action;
-}func_anti_snore_4_para_t;
-
+}func_anti_snore_4_para_t;//止鼾模式4
 
 
 
@@ -402,11 +400,11 @@ typedef struct
 {
 	union
 	{
-		func_relax_para_t 			    relax_para;  //放松模式
-		func_spa_para_t			        spa_para;       
-		func_sleep_enhance_para_t 	sleep_enhance_para;
-		func_push_spine_para_t		push_spine_para;
-		func_wakeup_para_t		wakeup_para;
+		func_relax_para_t 		    relax_para;
+		func_spa_para_t			    spa_para;        
+		func_sleep_enhance_para_t   sleep_enhance_para;
+		func_push_spine_para_t	    push_spine_para;
+		func_wakeup_para_t		    wakeup_para;
 		func_anti_snore_1_para_t  	anti_snore_1_para;
 		func_anti_snore_2_para_t  	anti_snore_2_para;
 		func_anti_snore_3_para_t  	anti_snore_3_para;
@@ -415,7 +413,7 @@ typedef struct
 	uint8_t partion;       //左床还是右床
 	tune_mode_t function;  //当前对应执行的模式
 	uint32_t total_sec_cnt;//模式总的执行时间
-	TimerHandle_t timer;
+	TimerHandle_t timer;   //定时器句柄
 }func_mng_t;//模式管理结构体
 
 

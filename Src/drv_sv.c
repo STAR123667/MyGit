@@ -10,50 +10,50 @@ uint32_t g_sv_state_mask;
 
 sv_item_t g_sv_item[]=
 {
-//	{ GPIOF, GPIO_PIN_11, 0, 0, 0, 2 },//电磁阀_左头
-//	{ GPIOF, GPIO_PIN_12, 0, 0, 0, 2 },//电磁阀_左肩
-//	{ GPIOF, GPIO_PIN_13, 0, 0, 0, 2 },//电磁阀_左腰
-//	{ GPIOF, GPIO_PIN_14, 0, 0, 0, 2 },//电磁阀_左臂-1
-//	{ GPIOF, GPIO_PIN_15, 0, 0, 0, 2 },//电磁阀_右头
-//	{ GPIOG, GPIO_PIN_0,  0, 0, 0, 2 },//电磁阀_右肩
-//	{ GPIOG, GPIO_PIN_1,  0, 0, 0, 2 },//电磁阀_右腰
-//	{ GPIOE, GPIO_PIN_11, 0, 0, 0, 2 },//电磁阀_右臂1
+	{ GPIOF, GPIO_PIN_11, 0, 0, 0, 2 },//电磁阀_左头
+	{ GPIOF, GPIO_PIN_12, 0, 0, 0, 2 },//电磁阀_左肩
+	{ GPIOF, GPIO_PIN_13, 0, 0, 0, 2 },//电磁阀_左腰
+	{ GPIOF, GPIO_PIN_14, 0, 0, 0, 2 },//电磁阀_左臂-1
+	{ GPIOF, GPIO_PIN_15, 0, 0, 0, 2 },//电磁阀_右头
+	{ GPIOG, GPIO_PIN_0,  0, 0, 0, 2 },//电磁阀_右肩
+	{ GPIOG, GPIO_PIN_1,  0, 0, 0, 2 },//电磁阀_右腰
+	{ GPIOE, GPIO_PIN_11, 0, 0, 0, 2 },//电磁阀_右臂1
 
-//	{ GPIOE, GPIO_PIN_7,  0, 0, 0, 2 },//电磁阀_左臂2
-//	{ GPIOE, GPIO_PIN_8,  0, 0, 0, 2 },//电磁阀_左臂3
-//	{ GPIOE, GPIO_PIN_9,  0, 0, 0, 2 },//电磁阀_左臂4
-//	{ GPIOE, GPIO_PIN_10, 0, 0, 0, 2 },//电磁阀_左小腿
-//	{ GPIOE, GPIO_PIN_12, 0, 0, 0, 2 },//电磁阀_右臂-2
-//	{ GPIOE, GPIO_PIN_13, 0, 0, 0, 2 },//电磁阀_右臂-3
-//	{ GPIOD, GPIO_PIN_9,  0, 0, 0, 2 },//电磁阀_右臂-4
-//	{ GPIOD, GPIO_PIN_10, 0, 0, 0, 2 },//电磁阀_右小腿
+	{ GPIOE, GPIO_PIN_7,  0, 0, 0, 2 },//电磁阀_左臂2
+	{ GPIOE, GPIO_PIN_8,  0, 0, 0, 2 },//电磁阀_左臂3
+	{ GPIOE, GPIO_PIN_9,  0, 0, 0, 2 },//电磁阀_左臂4
+	{ GPIOE, GPIO_PIN_10, 0, 0, 0, 2 },//电磁阀_左小腿
+	{ GPIOE, GPIO_PIN_12, 0, 0, 0, 2 },//电磁阀_右臂-2
+	{ GPIOE, GPIO_PIN_13, 0, 0, 0, 2 },//电磁阀_右臂-3
+	{ GPIOD, GPIO_PIN_9,  0, 0, 0, 2 },//电磁阀_右臂-4
+	{ GPIOD, GPIO_PIN_10, 0, 0, 0, 2 },//电磁阀_右小腿
 
-//	{ GPIOE, GPIO_PIN_14, 0, 0, 0, 2 },//电磁阀_放气1
-//	{ GPIOD, GPIO_PIN_8,  0, 0, 0, 2 },//电磁阀_放气2
-//	{ GPIOD, GPIO_PIN_11, 0, 0, 0, 2 },//电磁阀_放气3
+	{ GPIOE, GPIO_PIN_14, 0, 0, 0, 2 },//电磁阀_放气1
+	{ GPIOD, GPIO_PIN_8,  0, 0, 0, 2 },//电磁阀_放气2
+	{ GPIOD, GPIO_PIN_11, 0, 0, 0, 2 },//电磁阀_放气3
 
 
-    { GPIOF, GPIO_PIN_11 },//电磁阀_左头
-	{ GPIOF, GPIO_PIN_12 },//电磁阀_左肩
-	{ GPIOF, GPIO_PIN_13 },//电磁阀_左腰
-	{ GPIOF, GPIO_PIN_14 },//电磁阀_左臂-1
-	{ GPIOE, GPIO_PIN_7 },//电磁阀_左臂-2
-	{ GPIOE, GPIO_PIN_8 },//电磁阀_左臂-3
-	{ GPIOE, GPIO_PIN_9 },//电磁阀_左臂-4
-	{ GPIOE, GPIO_PIN_10 },//电磁阀_左小腿
+//    { GPIOF, GPIO_PIN_11 },//电磁阀_左头
+//	{ GPIOF, GPIO_PIN_12 },//电磁阀_左肩
+//	{ GPIOF, GPIO_PIN_13 },//电磁阀_左腰
+//	{ GPIOF, GPIO_PIN_14 },//电磁阀_左臂-1
+//	{ GPIOE, GPIO_PIN_7 },//电磁阀_左臂-2
+//	{ GPIOE, GPIO_PIN_8 },//电磁阀_左臂-3
+//	{ GPIOE, GPIO_PIN_9 },//电磁阀_左臂-4
+//	{ GPIOE, GPIO_PIN_10 },//电磁阀_左小腿
 
-	{ GPIOF, GPIO_PIN_15 },//电磁阀_右头
-	{ GPIOG, GPIO_PIN_0 }, //电磁阀_右肩
-	{ GPIOG, GPIO_PIN_1 }, //电磁阀_右腰
-	{ GPIOE, GPIO_PIN_11 },//电磁阀_右臂1
-	{ GPIOE, GPIO_PIN_12 },//电磁阀_右臂-2    
-	{ GPIOE, GPIO_PIN_13 },//电磁阀_右臂-3
-	{ GPIOD, GPIO_PIN_9 }, //电磁阀_右臂-4
-	{ GPIOD, GPIO_PIN_10 },//电磁阀_右小腿 
+//	{ GPIOF, GPIO_PIN_15 },//电磁阀_右头
+//	{ GPIOG, GPIO_PIN_0 }, //电磁阀_右肩
+//	{ GPIOG, GPIO_PIN_1 }, //电磁阀_右腰
+//	{ GPIOE, GPIO_PIN_11 },//电磁阀_右臂1
+//	{ GPIOE, GPIO_PIN_12 },//电磁阀_右臂-2    
+//	{ GPIOE, GPIO_PIN_13 },//电磁阀_右臂-3
+//	{ GPIOD, GPIO_PIN_9 }, //电磁阀_右臂-4
+//	{ GPIOD, GPIO_PIN_10 },//电磁阀_右小腿 
 
-	{ GPIOE, GPIO_PIN_14 },//电磁阀_放气1
-	{ GPIOD, GPIO_PIN_8 }, //电磁阀_放气2
-	{ GPIOD, GPIO_PIN_11 },//电磁阀_放气3
+//	{ GPIOE, GPIO_PIN_14 },//电磁阀_放气1
+//	{ GPIOD, GPIO_PIN_8 }, //电磁阀_放气2
+//	{ GPIOD, GPIO_PIN_11 },//电磁阀_放气3
 
 };
 

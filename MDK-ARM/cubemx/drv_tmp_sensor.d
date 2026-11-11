@@ -53,5 +53,6 @@ cubemx\drv_tmp_sensor.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/even
 cubemx\drv_tmp_sensor.o: D:\keilARM\ARM\version5.06\Bin\..\include\stdio.h
 cubemx\drv_tmp_sensor.o: ..\Src\drv_heater.h
 cubemx\drv_tmp_sensor.o: ..\Src\m_config.h
+cubemx\drv_tmp_sensor.o: ..\Src\drv_ai.h
 cubemx\drv_tmp_sensor.o: ..\Src\m_acm.h
 cubemx\drv_tmp_sensor.o: ../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS/cmsis_os.h
