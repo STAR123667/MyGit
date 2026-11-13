@@ -57,19 +57,19 @@
 #define ZHS_PUSH_SPINE_TOTAL_SEC			   	(60*10) //臂腿净排模式
 #define ZHS_SPA_MODE_TOTAL_SEC				    (60*10) //云柔全身速舒模式 
 #define ZHS_SLEEP_ENHANCE_MODE_TOTAL_SEC		(60*10) //浅澜速眠模式 
-#define ZHS_WAKEUP_MODE_TOTAL_SEC			    (60*2) 
+#define ZHS_WAKEUP_MODE_TOTAL_SEC			    (60*2)  //唤醒模式
 
 
 
-#define ZHS_EXPERIENCE_MODE_TOTAL_SEC			(60*10)
+#define ZHS_EXPERIENCE_MODE_TOTAL_SEC			(60*10) //体验模式
 #define ZHS_EXPERIENCE_MODE_INFLATE_SEC			4		//14 per min	
 #define ZHS_EXPERIENCE_MODE_DEFLATE_SEC			4
 
 
-#define ZHS_STANDARD_MODE_TOTAL_SEC				(60*15)
+#define ZHS_STANDARD_MODE_TOTAL_SEC				(60*15) //标准模式
 #define ZHS_STANDARD_MODE_STEP_2_INFLATE_SEC	3		//18 per min	
 #define ZHS_STANDARD_MODE_STEP_2_DEFLATE_SEC	3
-#define ZHS_STANDARD_MODE_STEP_2_TOTAL_SEC		(60*5)
+#define ZHS_STANDARD_MODE_STEP_2_TOTAL_SEC		(60*5) 
 #define ZHS_STANDARD_MODE_STEP_3_INFLATE_SEC	4		//14 per min	
 #define ZHS_STANDARD_MODE_STEP_3_DEFLATE_SEC	4
 
@@ -183,7 +183,7 @@ typedef struct
 
 typedef struct
 {
-	uint32_t acl_mask;
+	uint32_t acl_mask; 
 	float target_apr; 
 }tune_item_t;//调节项
 

@@ -46,7 +46,7 @@ void m_collector_init(void)// 初始化ADC采集线程
 		return;
 	}
 	m_adc_cache.size = ARRAY_SIZE(adc1_raw_result_a);
-	m_adc_cache.mis_cnt=0;
+	m_adc_cache.mis_cnt=0; 
 	m_adc_cache.b_new=false;
 
 	__HAL_RCC_GPIOD_CLK_ENABLE();
@@ -58,8 +58,8 @@ void m_collector_init(void)// 初始化ADC采集线程
 	HAL_GPIO_Init(GPIOD, &GPIO_InitStruct);
 	HAL_GPIO_WritePin(GPIOD, pin_mask, GPIO_PIN_SET); 
 	
-	osThreadDef(cltr, m_collector_thread, osPriorityNormal, 0, 1024);//创建ADC采集线程
-	osThreadCreate(osThread(cltr), NULL);
+	osThreadDef(cltr, m_collector_thread, osPriorityNormal, 0, 1024);//定义ADC线程参数
+	osThreadCreate(osThread(cltr), NULL); //创建ADC线程
 }
 
 
@@ -93,7 +93,7 @@ void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* AdcHandle)// ADC转换完成回
 
 void m_collector_thread(void const *argument)// ADC采集线程20ms，每个通道有5次采集值
 {
-	HAL_TIM_Base_Start(&htim3);//20ms
+	HAL_TIM_Base_Start(&htim3);//1ms
 	__HAL_TIM_ENABLE_IT(&htim3, TIM_IT_UPDATE);
 	if(HAL_ADC_Start_DMA(&hadc1, (uint32_t*)adc1_raw_result_a, ADC_CH_NUM*ADC_TIMES_PER_ROUND) != HAL_OK)
 	{
@@ -104,7 +104,7 @@ void m_collector_thread(void const *argument)// ADC采集线程20ms，每个通�
 	
 
 	for(;;) 
-	{
+	{  
 		xEventGroupWaitBits( collector_events, CLTR_EVENT_ADC_DONE , 1, 0, portMAX_DELAY );// 等待ADC转换完成事件
 		{
 			float volt[ADC_CH_NUM];
@@ -166,10 +166,10 @@ void m_collector_thread(void const *argument)// ADC采集线程20ms，每个通�
 //				update_apr.cap_mv[15] = volt[10];//电磁阀_右小腿 
 				
 				for(uint8_t i=0; i<ADC_CH_NUM; i++)
-        {
-      	  if(update_apr.cap_mv[i] >= 3.3)
-                  update_apr.cap_mv[i] = 3.3;
-        }
+               {
+      	           if(update_apr.cap_mv[i] >= 3.3)
+                   update_apr.cap_mv[i] = 3.3;
+               }
 				
 				m_acm_air_pressure_update( &update_apr );
 			}

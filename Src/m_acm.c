@@ -82,16 +82,16 @@ static uint16_t g_sip_sec_cnt[2]={0,0};
 static const acm_msg_handle_entry_t g_acm_msg_handle_tbl[]=
 {
 	{ACM_MSG_TYPE_UPDATE_APR, 		m_acm_air_pressure_update_handle },     // 气压检测反馈 
-	{ACM_MSG_TYPE_SET_TARGET_APR, 	m_acm_set_target_apr_handle },        // 设置气囊的目标气压
-	{ACM_MSG_TYPE_DUMP_INFO, 		m_dump_system_info_handle },              // 打印每一路气囊的信息
+	{ACM_MSG_TYPE_SET_TARGET_APR, 	m_acm_set_target_apr_handle },          // 设置气囊的目标气压
+	{ACM_MSG_TYPE_DUMP_INFO, 		m_dump_system_info_handle },            // 打印每一路气囊的信息
 	//{ACM_MSG_TYPE_UPDATE_CURRENT, 	m_acm_current_update_handle },      // 左气泵和右气泵和电磁阀3路电流检测  
 	{ACM_MSG_TYPE_STOP_APR_TUNNING, 	m_acm_stop_apr_tunning_handle },    // 停止所有气囊的调节 
-	{ACM_MSG_TYPE_SET_TARGET_APR_SEQ, 	m_acm_set_target_apr_seq_handle },// 并行调节多路气囊
+	{ACM_MSG_TYPE_SET_TARGET_APR_SEQ, 	m_acm_set_target_apr_seq_handle },  // 并行调节多路气囊
 	{ACM_MSG_TYPE_SET_PARA, 	m_acm_set_run_para_handle },                // 设置运行参数
 
-	{ ACM_MSG_TYPE_SECOND_TICK, m_acm_second_tick_handle },               // 秒级定时器
-	{ ACM_MSG_TYPE_SWITCH_MODE, m_acm_switch_function_handle },           // 模式切换
-	{ ACM_MSG_TYPE_AI_CTRL, m_acm_ai_ctrl_handle },                       // AI模块指令响应
+	{ ACM_MSG_TYPE_SECOND_TICK, m_acm_second_tick_handle },                 // 秒级定时器
+	{ ACM_MSG_TYPE_SWITCH_MODE, m_acm_switch_function_handle },             // 模式切换
+	{ ACM_MSG_TYPE_AI_CTRL, m_acm_ai_ctrl_handle },                         // AI模块指令响应
 	
 };
 
@@ -452,7 +452,7 @@ void m_acm_thread(void const * argument)
 BaseType_t m_acm_post_msg( acm_msg_type_t type, acm_msg_content_t *content, uint8_t b_from_isr ) // 发送消息 
 {
 	acm_msg_t msg;      
-	BaseType_t xReturn;
+	BaseType_t xReturn;// 
 
 	msg.type = type;
 
@@ -514,7 +514,7 @@ void m_acm_air_pressure_update_handle(acm_msg_content_t *content)
 	p_cap_volt = content->update_apr.cap_mv;
 	for(i=0;i<MAX_ACL_NUM;i++)
 	{
-		cap_pa= m_adc_convert_to_kpa( p_cap_volt[i] );
+		cap_pa= m_adc_convert_to_kpa( p_cap_volt[i] ); //每个通道ADC转换气压值
 		
 		if(cap_pa>0)
 		{
@@ -523,7 +523,7 @@ void m_acm_air_pressure_update_handle(acm_msg_content_t *content)
 		}
 	}
 
-	if( true == b_new_value )
+	if( true == b_new_value )//有新的值
 	{
 		for(i=0;i<MAX_ACL_NUM;i++)
 		{
@@ -556,7 +556,7 @@ void m_acm_set_target_apr_handle(acm_msg_content_t *content)
 			acm_t *p = &g_acm_table[ i ];
 
 			if(BIT(i)&acl_mask)
-			{
+			{ 
 				if(DIFF(content->set_apr.target_apr, p->current_apr) > APR_EPSILON )
 				{
 					p->target_apr = content->set_apr.target_apr;
@@ -705,14 +705,14 @@ void m_acm_refress_comparison(void)// 比较气压值
 	 
 	for(i=0;i<MAX_ACL_NUM;i++)	
 	{
-		p=&g_acm_table[i];
+		p=&g_acm_table[i]; 
 
 		if(p->sv_delay_cnt >0)
 		{
 			p->sv_delay_cnt --;
 			if(0==p->sv_delay_cnt )
 			{
-				drv_solenoid_valve_control(i, M_SV_OFF);
+				drv_solenoid_valve_control(i, M_SV_OFF);  
 				LOG("sv[ %d ] turn off", i);
 			}
 		}
@@ -837,7 +837,7 @@ void m_acm_refress_comparison(void)// 比较气压值
 		}
 	}
 
-	if(rpt_apr_cnt>=100)	//  2 second
+	if(rpt_apr_cnt>=600)	//  2 second
 	{
 		uint8_t mode_match=false;
 		
@@ -3905,7 +3905,7 @@ uint8_t m_get_pump_strength(  uint8_t partion )
 	return g_strength[0];
 }
 
-void m_acm_ai_ctrl( acm_msg_ai_ctrl_t * content )
+void m_acm_ai_ctrl( acm_msg_ai_ctrl_t * content )//
 {
 	acm_msg_content_t msg_content;
 

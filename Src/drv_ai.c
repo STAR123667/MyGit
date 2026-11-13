@@ -57,56 +57,57 @@ void drv_ai_process_frame( uint8_t *frame, uint16_t length )
 	acm_msg_set_apr_seq_t  apr_seq;
 
 	posture_old[0] = g_sensor_status[0].posture;
-	posture_old[1] = g_sensor_status[1].posture;// 
+	posture_old[1] = g_sensor_status[1].posture;
 	
-	if(drv_ai_is_frame_valaid(frame, length) == true)
+	if(drv_ai_is_frame_valaid(frame, length) == true)// 校验AI帧，头 A5 A5 尾部 0D 0A
 	{
-		if( (58 == length )&&(0x02 == frame[12])&&(0x10 == frame[13]) ) // AI control
+		if( (58 == length )&&(0x02 == frame[12])&&(0x10 == frame[13]) )//筛选AI控制帧
 		{
-			if((true == m_is_ai_action_doing())&&(false == m_is_tunning_queue_empty()))// 正在执行AI控制，忽略
+			if((true == m_is_ai_action_doing())&&(false == m_is_tunning_queue_empty()))// 忙时过滤，直接忽略
 			{
-				LOG("@@@@@ doing ai ctrl, ignore");
+				LOG("@@@@@ doing ai ctrl, ignore");// 
 			}
-			else
+			else //解析左右两区人体状态
 			{
 				
 				acm_msg_ai_ctrl_t ai_ctrl;
 			
-				left_apr_list = &frame[36];// 
-				right_apr_list = &frame[45];//
+				left_apr_list = &frame[36];  //左区气压列表
+				right_apr_list = &frame[45]; //右区气压列表
 			
 				ai_ctrl.mask = 0;
 
-				g_sensor_status[0].posture= frame[16];
-				g_sensor_status[0].knee_pos = frame[17];
+                /*frame[16]~frame[25]*/
+				g_sensor_status[0].posture= frame[16];   //左区人体姿势
+				g_sensor_status[0].knee_pos = frame[17]; //左区膝盖姿势
 
 				for(uint8_t i=0;i<4;i++)
 				{
-					g_sensor_status[0].haunch_mask[i] = frame[18+i];
+					g_sensor_status[0].haunch_mask[i] = frame[18+i];//左区臂部掩码
 				}
 				for(uint8_t i=0;i<4;i++)
 				{
-					g_sensor_status[0].knee_mask[i] = frame[22+i];
+					g_sensor_status[0].knee_mask[i] = frame[22+i];//左区膝盖掩码
 				}
 
-
-				g_sensor_status[1].posture= frame[26];
-				g_sensor_status[1].knee_pos = frame[27];
+                /*frame[26]~frame[35]*/
+				g_sensor_status[1].posture= frame[26];  //右区人体姿势 
+				g_sensor_status[1].knee_pos = frame[27];//右区膝盖姿势
 
 				for(uint8_t i=0;i<4;i++)
 				{
-					g_sensor_status[1].haunch_mask[i] = frame[28+i];
+					g_sensor_status[1].haunch_mask[i] = frame[28+i];//右区臂部掩码
 				}
 				for(uint8_t i=0;i<4;i++)
 				{
-					g_sensor_status[1].knee_mask[i] = frame[32+i];
+					g_sensor_status[1].knee_mask[i] = frame[32+i];//右区膝盖掩码
 				}
 
 				apr_seq.mask = 0;
 				
 				for(uint8_t i=0;i<2;i++)
 				{
-					if( POSTURE_NO_PERSON == g_sensor_status[i].posture )  // 无效姿势
+					if( POSTURE_NO_PERSON == g_sensor_status[i].posture )  //无人
 					{
 						if(leave_bed_cnt[i]<5) // 离开床5次，气囊并行调节
 						{
@@ -118,7 +119,7 @@ void drv_ai_process_frame( uint8_t *frame, uint16_t length )
 									for(uint8_t n=1;n<8;n++)
 									{
 										apr_seq.mask  |= BIT(n); // 并行调节
-										apr_seq.target_apr[n] = MAX_APR*0.5f; /* 释放到半压 */
+										apr_seq.target_apr[n] = MAX_APR*0.5f; /* 左床释放到半压 */
 									}
 								}
 								
@@ -127,14 +128,14 @@ void drv_ai_process_frame( uint8_t *frame, uint16_t length )
 									for(uint8_t n=9;n<16;n++)
 									{
 										apr_seq.mask  |= BIT(n); // 并行调节
-										apr_seq.target_apr[n] = MAX_APR*0.5f; /* 释放到半压 */
+										apr_seq.target_apr[n] = MAX_APR*0.5f; /* 右床释放到半压 */
 									}
 								}
 								
 							}
 						}
 					}
-					else // 有效姿势
+					else //有人
 					{
 						leave_bed_cnt[i] = 0;
 					}
@@ -148,7 +149,7 @@ void drv_ai_process_frame( uint8_t *frame, uint16_t length )
 				{
 					if( (g_sensor_status[0].posture!=POSTURE_INVALAID)&&
 						(g_sensor_status[0].posture != posture_old[0] )&&
-						(TUNE_MODE_AUTO == m_get_run_para_instance(PARTION_LEFT)->tune_mode))
+						(TUNE_MODE_AUTO == m_get_run_para_instance(PARTION_LEFT)->tune_mode))//左边姿势有变化
 					{
 						LOG("^^^^^ left posture %d change to %d", posture_old[0], g_sensor_status[0].posture );
 						for(uint8_t i=0;i<MAX_ACL_NUM/2;i++)
@@ -171,7 +172,7 @@ void drv_ai_process_frame( uint8_t *frame, uint16_t length )
 
 					if( (g_sensor_status[1].posture!=POSTURE_INVALAID)&&
 						(g_sensor_status[1].posture != posture_old[1] )&&
-						(TUNE_MODE_AUTO == m_get_run_para_instance(PARTION_RIGHT)->tune_mode))	
+						(TUNE_MODE_AUTO == m_get_run_para_instance(PARTION_RIGHT)->tune_mode) )//右边姿势有变化
 					{
 						LOG("^^^^^ right posture %d change to %d", posture_old[1], g_sensor_status[1].posture );
 						
@@ -195,13 +196,13 @@ void drv_ai_process_frame( uint8_t *frame, uint16_t length )
 					
 					if(ai_ctrl.mask != 0)
 					{
-						m_acm_ai_ctrl( &ai_ctrl );
+						m_acm_ai_ctrl( &ai_ctrl );//下发到气囊控制模块
 					}
 				}
 			}
 		}
 
-		m_build_and_send_frame_to_ai(frame[2], &status, 1 );
+		m_build_and_send_frame_to_ai(frame[2], &status, 1 );//应答帧ACK
 	}
 	else
 	{
@@ -224,12 +225,8 @@ uint8_t drv_ai_is_frame_valaid(uint8_t *frame, uint16_t length )
 		crc_len = 2;
 	}
 	
-	if(
-	    (0xA5==frame[0])&&
-	    (0xA5==frame[1])&&
-	    (0x0A==frame[length-1])&&
-	    (0x0D==frame[length-2]))
-	{
+	if((0xA5==frame[0])&&(0xA5==frame[1])&&(0x0A==frame[length-1])&&(0x0D==frame[length-2]))
+    {
 		uint16_t cs;
 		uint16_t cs_calc;
 

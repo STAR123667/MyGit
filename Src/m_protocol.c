@@ -48,8 +48,6 @@ void mp_get_sip_handle( uint8_t *data, uint16_t length );/* 查询SIP开关状�
 
 void mp_set_heater_timer_handle( uint8_t *data, uint16_t length );/* 定时加热: 设定时间到后自动关闭 */
 
-void send_version_rsp(void);/* 云端查询控制盒的版本号 */
-
 const m_cmd_entry_t g_m_cmd_entrys[]= 
 {  
 	{ M_CMD_GET_TUNE_MODE, mp_get_tune_mode_handle },         //查询当前工作模式
@@ -114,34 +112,6 @@ void mp_rx_downlink_data_handle( uint8_t *data, uint16_t length )//下行数据�
 	{
 		p = data + offset;  // 指向当前帧的起始位置
 		
-		/* 云端查询主板版本号: A5 A5 0xE0 0x01 OBJ FCS (兼容带 0x5E 结尾) */
-		if( ((length - offset) >= 6) && (0xA5 == p[0]) && (0xA5 == p[1]) )
-		{
-			uint8_t cmd_v = p[2];
-			uint8_t len_v = p[3];
-            /*解析云端下发查询版本号*/
-			if( (M_CMD_VERSION_QUERY == cmd_v) && (0x01 == len_v) )
-			{
-				uint8_t obj  = p[4];
-				uint8_t fcs  = p[5];
-				uint8_t calc = (uint8_t)(cmd_v + len_v + obj);
-
-				if( fcs == calc )	/* 校验通过 */
-				{
-					if( OBJ_MAIN_BOARD == obj )	/* 查询对象是主板 */
-					{
-						send_version_rsp();	/* 上行返回版本号 */
-					}
-
-					offset += 6;		/* 消费整帧 */
-					if( (offset < length) && (MJ_EOF == data[offset]) )
-					{
-						offset++;		/* 兼容 7 字节帧的 0x5E 结尾 */
-					}
-					continue;// 跳出循环
-				}
-			}
-		}
         /*解析APP/云端下发协议*/
 		if((0xA5 == p[0])&&(0xA5 == p[1]))
 		{
@@ -306,6 +276,20 @@ void mp_manual_cfg_target_apr_handle( uint8_t *data, uint16_t length )
 	{
 		return;
 	}
+
+
+     /* ===== 立即回复收到帧（收到即回复） =====
+	 * 帧格式: B5 B5 F7 02 [床侧] [0x02] [CS] 5E
+	 * LEN=02, payload[0]=床侧, payload[1]=0x02(收到标志)
+	 * 与执行完成后的响应帧(LEN=01, payload[0]=0x00)通过 payload 值区分开
+	 */
+	{
+		uint8_t roger_payload[2];
+		roger_payload[0] = partion;
+		roger_payload[1] = 0x02;
+		mp_build_and_send_frame( M_CMD_MENUAL_CFG_APR, roger_payload, 2 );
+	}
+    
 
 	LOG(" partion: %d, \r\napr:",partion);
 	for(uint8_t i=0;i<8;i++)
@@ -596,37 +580,35 @@ void mp_get_wifi_mac_handle( uint8_t *data, uint16_t length )
 		wifi_mac[3], wifi_mac[4], wifi_mac[5] );
 }
 
+//设备上报云端主板版本号
 void mp_get_device_info_handle( uint8_t *data, uint16_t length )
 {
 	//if(mp_get_role()==M_ROLE_MASTER)
 //	{
-		uint8_t payload[18];
-		uint8_t *p_offset;
+        uint8_t frame[15]; 
+	    uint8_t *p = frame;
 
-		p_offset = payload;
+       *p++ = 0xB5;                    // SOF high
+       *p++ = 0xB5;                    // SOF low
+       *p++ = M_CMD_DEV_INFO;       // CMD = 0xE1
+       *p++ = 0x09;                    // LEN = 9
+     
+       *p++ = 0x02;                 
 
-		*p_offset++ = HIGH_BYTE(IMG_TYPE);
-		*p_offset++ = LOW_BYTE(IMG_TYPE);
+       *p++ = MB_FW_VERSION_MAJOR;     // 固件主版本      
+       *p++ = MB_FW_VERSION_MINOR;     // 固件次版本
+       *p++ = MB_FW_VERSION_PATCH;     // 固件修订号
 
-		*p_offset++ = HIGH_BYTE(MF_CODE);
-		*p_offset++ = LOW_BYTE(MF_CODE);
+       *p++ = MB_HW_VERSION_J;         // 硬件主版本
+       *p++ = MB_HW_VERSION_N;         // 硬件次版本
+       *p++ = MB_HW_VERSION_T;         // 硬件修订号
+       *p++ = 0x00;                    // SAVE_1
+       *p++ = 0x00;                    // SAVE_2
+    
+	   *p++ = mp_calc_cs(frame + 2, 2 + 9);  // FCS = CMD~SAVE_2累加和
+       *p++ = MJ_EOF;                     // 0x5E
 
-		*p_offset++ = BREAK_UINT32(0, 3);
-		*p_offset++ = BREAK_UINT32(0, 2);
-		*p_offset++ = BREAK_UINT32(HW_VER_VALUE, 1);
-		*p_offset++ = BREAK_UINT32(HW_VER_VALUE, 0);
-		
-		*p_offset++ = BREAK_UINT32(SW_VER_VALUE, 3);
-		*p_offset++ = BREAK_UINT32(SW_VER_VALUE, 2);
-		*p_offset++ = BREAK_UINT32(SW_VER_VALUE, 1);
-		*p_offset++ = BREAK_UINT32(SW_VER_VALUE, 0);
-
-		for(uint8_t i=0;i<6;i++)
-		{
-			*p_offset++ = wifi_mac[i];
-		}
-
-		mp_build_and_send_frame( M_CMD_DEV_INFO_RRSP, payload, sizeof(payload) );
+		mp_build_and_send_frame( M_CMD_DEV_INFO_RRSP, frame, sizeof(frame) );
 //	}
 }
 
@@ -857,35 +839,4 @@ void mp_set_heater_timer_handle( uint8_t *data, uint16_t length )/* 定时加热
 	}
 
 	mp_build_and_send_frame( M_CMD_SET_HEATER_TIMER_RSP, payload, 2 );
-}
-
-
-//设备上报云端主板版本号
-void send_version_rsp(void)
-{
-       uint8_t frame[15]; 
-	     uint8_t *p = frame;
-
-       *p++ = 0xB5;                    // SOF high
-       *p++ = 0xB5;                    // SOF low
-       *p++ = M_CMD_VERSION_RSP;       // CMD = 0xE1
-       *p++ = 0x09;                    // LEN = 9
-     
-       *p++ = 0x02;                 
-
-       *p++ = MB_FW_VERSION_MAJOR;     // 固件主版本      
-       *p++ = MB_FW_VERSION_MINOR;     // 固件次版本
-       *p++ = MB_FW_VERSION_PATCH;     // 固件修订号
-
-       *p++ = MB_HW_VERSION_J;         // 硬件主版本
-       *p++ = MB_HW_VERSION_N;         // 硬件次版本
-       *p++ = MB_HW_VERSION_T;         // 硬件修订号
-       *p++ = 0x00;                    // SAVE_1
-       *p++ = 0x00;                    // SAVE_2
-    
-	     *p++ = mp_calc_cs(frame + 2, 2 + 9);  // FCS = CMD~SAVE_2累加和
-       *p++ = MJ_EOF;                     // 0x5E
-
-        HAL_UART_Transmit(&huart3, frame, sizeof(frame), 10);
-
 }

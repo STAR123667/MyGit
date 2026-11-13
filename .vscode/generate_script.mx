@@ -1,0 +1,3 @@
+config load f:\桌面\满佳固件源码\m_mtrs_eon_s16-2026-11-03(最新控制盒源码)\cubemx\cubemx.ioc
+project generate f:\桌面\满佳固件源码\m_mtrs_eon_s16-2026-11-03(最新控制盒源码)\cubemx
+exit

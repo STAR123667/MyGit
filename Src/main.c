@@ -444,7 +444,7 @@ static void MX_ADC1_Init(void)
   * @param None
   * @retval None
   */
-static void MX_TIM3_Init(void)
+static void MX_TIM3_Init(void)//Tim3_1ms
 {
 
   /* USER CODE BEGIN TIM3_Init 0 */
@@ -489,7 +489,7 @@ static void MX_TIM3_Init(void)
   * @param None
   * @retval None
   */
-static void MX_TIM4_Init(void)
+static void MX_TIM4_Init(void)//Tim4_10ms
 {
 
   /* USER CODE BEGIN TIM4_Init 0 */
@@ -554,7 +554,7 @@ static void MX_TIM4_Init(void)
   * @param None
   * @retval None
   */
-static void MX_TIM6_Init(void)
+static void MX_TIM6_Init(void)//tim6_21us
 {
 
   /* USER CODE BEGIN TIM6_Init 0 */
