@@ -1,0 +1,15 @@
+cubemx\queue.o: ../Middlewares/Third_Party/FreeRTOS/Source/queue.c
+cubemx\queue.o: D:\keilARM\ARM\version5.06\Bin\..\include\stdlib.h
+cubemx\queue.o: D:\keilARM\ARM\version5.06\Bin\..\include\string.h
+cubemx\queue.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/FreeRTOS.h
+cubemx\queue.o: D:\keilARM\ARM\version5.06\Bin\..\include\stddef.h
+cubemx\queue.o: D:\keilARM\ARM\version5.06\Bin\..\include\stdint.h
+cubemx\queue.o: ../Inc/FreeRTOSConfig.h
+cubemx\queue.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/projdefs.h
+cubemx\queue.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/portable.h
+cubemx\queue.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/deprecated_definitions.h
+cubemx\queue.o: ../Middlewares/Third_Party/FreeRTOS/Source/portable/RVDS/ARM_CM4F/portmacro.h
+cubemx\queue.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/mpu_wrappers.h
+cubemx\queue.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/task.h
+cubemx\queue.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/list.h
+cubemx\queue.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/queue.h

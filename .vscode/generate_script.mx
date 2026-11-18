@@ -1,0 +1,3 @@
+config load f:\桌面\MyGit-sleepCode_manjia\cubemx.ioc
+project generate f:\桌面\MyGit-sleepCode_manjia
+exit
