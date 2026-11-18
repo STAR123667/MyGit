@@ -128,7 +128,7 @@ void m_collector_thread(void const *argument)// ADC采集线程20ms，每个通�
 
 					volt[ch] /= ADC_TIMES_PER_ROUND;
 				}
-
+/*更改IO口*/
 //				update_apr.cap_mv[0] = volt[9];  //ADC_左头
 //				update_apr.cap_mv[1] = volt[15]; //ADC_左肩
 //				update_apr.cap_mv[2] = volt[7];  //ADC_左腰
@@ -146,7 +146,7 @@ void m_collector_thread(void const *argument)// ADC采集线程20ms，每个通�
 //				update_apr.cap_mv[13] = volt[0]; //ADC_右臂3
 //				update_apr.cap_mv[14] = volt[12];//ADC_右臂4
 //				update_apr.cap_mv[15] = volt[10];//ADC_右小腿
-
+/*原来IO口*/
 				update_apr.cap_mv[0] = volt[9]; //电磁阀_左头
 				update_apr.cap_mv[1] = volt[15];//电磁阀_左肩
 				update_apr.cap_mv[2] = volt[7]; //电磁阀_左腰

@@ -10,6 +10,7 @@ uint32_t g_sv_state_mask;
 
 sv_item_t g_sv_item[]=
 {
+/*更改IO口*/
 //	{ GPIOF, GPIO_PIN_11, 0, 0, 0, 2 },//电磁阀_左头
 //	{ GPIOF, GPIO_PIN_12, 0, 0, 0, 2 },//电磁阀_左肩
 //	{ GPIOF, GPIO_PIN_13, 0, 0, 0, 2 },//电磁阀_左腰
@@ -32,8 +33,8 @@ sv_item_t g_sv_item[]=
 //	{ GPIOD, GPIO_PIN_8,  0, 0, 0, 2 },//电磁阀_放气2
 //	{ GPIOD, GPIO_PIN_11, 0, 0, 0, 2 },//电磁阀_放气3
 
-
-  { GPIOF, GPIO_PIN_11 },//电磁阀_左头
+/*原来IO口*/
+    { GPIOF, GPIO_PIN_11 },//电磁阀_左头
 	{ GPIOF, GPIO_PIN_12 },//电磁阀_左肩
 	{ GPIOF, GPIO_PIN_13 },//电磁阀_左腰
 	{ GPIOF, GPIO_PIN_14 },//电磁阀_左臂-1
